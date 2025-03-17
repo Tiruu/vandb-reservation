@@ -1,0 +1,82 @@
+/* 🌍 Scrollbar horizontale en haut */
+.table-responsive {
+    position: relative;
+}
+
+.scroll-wrapper {
+    overflow-x: auto;
+    white-space: nowrap;
+    margin-bottom: 10px;
+}
+
+#calendarTable {
+    min-width: 100%;
+    border-collapse: collapse;
+}
+
+/* 🏷️ Agrandir la colonne des tireuses */
+#calendarTable th:first-child,
+#calendarTable td:first-child {
+    padding-left: 5px;
+    min-width: 180px; /* Augmenter la largeur */
+    white-space: nowrap; /* Empêcher le retour à la ligne */
+    text-align: left;
+    font-weight: bold;
+}
+
+/* 📏 Réduire la hauteur des lignes */
+#calendarTable th, #calendarTable td {
+    padding: 0px;
+    text-align: center;
+    font-size: 14px;
+}
+
+/* ✅ Colorer les cases avec réservations en vert */
+td.reserved {
+    background-color: #28a745; /* Vert Bootstrap */
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* ✅ Améliorer l'affichage des icônes calendrier */
+td.reserved::after {
+    content: "";
+    font-size: 16px;
+}
+
+/* Ensures the today column is clearly visible */
+/* Highlight the entire column for today, but not the green boxes */
+#calendarTable th.today-column,
+#calendarTable td.today-column:not(.reserved) {
+    background-color: gold !important; /* Gold for empty cells */
+    font-weight: bold !important;
+}
+
+/* Ensure reserved (green) cells remain unchanged */
+#calendarTable td.today-column.reserved {
+    background-color: #28a745 !important; /* Keep green */
+    color: white !important;
+}
+#calendarTable td.today-column.annual-reserved {
+    background-color: blue !important; /* Keep green */
+    color: white !important;
+}
+
+/* 🔶 Highlight today's column */
+.today-column {
+    background-color: gold !important;
+}
+
+/* 🔵 Annual reservations in blue */
+.annual-reserved {
+    background-color: blue !important;
+    color: white;
+}
+
+/* ✅ Normal reservations in green */
+.reserved {
+    background-color: #28a745 !important;
+    color: white;
+}
+

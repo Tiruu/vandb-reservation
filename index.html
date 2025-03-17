@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Réservations | Gestion Tireuses</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="index.html">Gestion Tireuses</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="index.html">Réservations</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="calendar.html">Calendrier</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="inventory.html">Stocks</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h2 class="mb-4">Gestion des Réservations</h2>
+
+        <button class="btn btn-success mb-3" id="addReservationBtn">+ Ajouter une Réservation</button>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Annuelle ?</th>
+                                <th>Client</th>
+                                <th>Téléphone</th>
+                                <th>Début</th>
+                                <th>Fin</th>
+                                <th>Tireuse</th>
+                                <th>Fûts</th>
+                                <th>Options</th>
+                                <th>Commentaires</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reservationsTableBody">
+                            <!-- Le contenu sera généré dynamiquement -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal pour ajouter/modifier une réservation -->
+    <div class="modal fade" id="reservationModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">Nouvelle Réservation</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="reservationForm">
+                        <div class="row">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="annualReservation">
+                                <label class="form-check-label" for="annualReservation">Réservation Annuelle</label>
+                            </div>
+                            <div class="col-md-6">
+                                <label>Nom du Client</label>
+                                <input type="text" id="clientName" class="form-control" required>
+                                <label>Téléphone</label>
+                                <input type="tel" id="clientPhone" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label>Date de début</label>
+                                <input type="date" id="startDate" class="form-control" required>
+                                <label>Date de fin</label>
+                                <input type="date" id="endDate" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <label>Type de Tireuse</label>
+                                <select id="tapType" class="form-select">
+                                    <option value="">Choisir un type de tireuse...</option>
+                                    <option value="FS">Froid Sec</option>
+                                    <option value="T1">Trappiste 1</option>
+                                    <option value="T2">Trappiste 2</option>
+                                    <option value="Tonneau">Tonneau</option>
+                                    <option value="Bertha">Bertha</option>
+                                    <option value="Festoche">Festoche</option>
+                                    <option value="Picolo">Picolo</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label>Numéro de Tireuse</label>
+                                <select id="tapNumber" class="form-select">
+                                    <option value="" selected>Choisir une tireuse...</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <label>Type de Fût</label>
+                                <select id="beerType" class="form-select">
+                                    <option value="">Choisir un type de fût...</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label>Quantité</label>
+                                <input value="0" type="number" id="beerQuantity" class="form-control" min="1">
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-12">
+                                <label>Commentaire</label>
+                                <textarea id="comment" class="form-control" rows="3" placeholder="Ajoutez un commentaire..."></textarea>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="barnumOption">
+                                    <label class="form-check-label" for="barnumOption">Barnum 3x3</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="barnum2Option">
+                                    <label class="form-check-label" for="barnum2Option">Barnum 3x6</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="photoBoothOption">
+                                    <label class="form-check-label" for="photoBoothOption">Borne Photo</label>
+                                </div>
+                            </div>
+                            <!-- ✅ Colonne droite : Empiler les boutons verticalement en bas à droite -->
+                            <div class="col-md-6 d-flex flex-column align-items-end">
+                                <button type="button" class="btn btn-secondary mb-2" data-bs-dismiss="modal">Annuler</button>
+                                <button type="button" class="btn btn-primary" id="saveReservation">Enregistrer</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="d-flex justify-content-end mb-3">
+        <button id="exportData" class="btn btn-outline-primary me-2">Exporter</button>
+        <input type="file" id="importFile" class="d-none">
+        <button id="importData" class="btn btn-outline-primary">Importer</button>
+    </div>
+    
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="scripts/database.js"></script>
+    <script src="scripts/reservations_combined.js"></script>
+</body>
+</html>
