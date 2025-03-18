@@ -374,7 +374,7 @@ function createReservationRow(reservation) {
         <td>${reservation.clientPhone || '-'}</td>
         <td>${formatDate(reservation.startDate)}</td>
         <td>${formatDate(reservation.endDate)}</td>
-        <td>${reservation.tapType} ${reservation.tapNumber}</td>
+        <td>${reservation.tapNumber}</td>
         <td>${reservation.beers.map(beer => `${beer.quantity} × ${beer.type}`).join('<br>')}</td>
         <td>${reservation.barnumOption ? "Barnum 3x3" : ""} ${reservation.barnum2Option ? "Barnum 3x6" : ""} ${reservation.photoBoothOption ? "Borne Photo" : ""}</td>
         <td>${reservation.comment || "-"}</td>

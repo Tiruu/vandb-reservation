@@ -108,16 +108,6 @@ td.reserved::after {
     font-weight: bold;
 }
 
-/* Style pour les tableaux */
-#annualReservationsTableBody tr {
-    background-color: rgba(25, 135, 84, 0.03); /* Très légère teinte verte */
-}
-
-/* Survol des lignes */
-.table tbody tr:hover {
-    background-color: rgba(0, 0, 0, 0.075);
-}
-
 
 /* Style for the tables */
 .table {
@@ -144,9 +134,4 @@ td.reserved::after {
 /* Alternate row colors for better readability */
 .table-striped tbody tr:nth-child(odd) {
     background-color: #f9f9f9;
-}
-
-/* Hover effect for better UX */
-.table tbody tr:hover {
-    background-color: rgba(0, 0, 0, 0.075);
 }

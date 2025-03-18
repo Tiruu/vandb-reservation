@@ -109,7 +109,11 @@ async function updateCalendar() {
                         td.classList.add('reserved'); // ✅ Green for normal reservations
                     }
                     td.textContent = "";
-                    td.title = dayReservations.map(res => `${res.clientName} - ${res.beers[0].type}`).join("\n");
+                    td.title = dayReservations.map(res => {
+                       const beerInfo = (res.beers && res.beers.length > 0) ? `${res.beers[0].type} x${res.beers[0].quantity}` : "Aucune bière";
+                       return `${res.clientName} - ${beerInfo}`;
+                    }).join("\n");
+
                     td.addEventListener("click", () => showReservationsModal(dayReservations, date));
                 }
 

@@ -1,7 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('addBeerTypeBtn').addEventListener('click', addBeerType);
+
+    const weekStartInput = document.getElementById("weekStartDate");
+    weekStartInput.value = getMonday(new Date()).toISOString().split("T")[0];
+
+    weekStartInput.addEventListener("change", updateInventoryDisplay);
+
     updateInventoryDisplay();
     updateEquipmentDisplay();
-    document.getElementById('addBeerTypeBtn').addEventListener('click', addBeerType);
 });
 
 // **Récupère ou initialise le stock des bières dans localStorage**
@@ -18,17 +24,20 @@ function getBeerStock() {
 // **Sauvegarde le stock des bières**
 function saveBeerStock(beerStock) {
     localStorage.setItem('beerStock', JSON.stringify(beerStock));
-    syncBeerListWithReservations(); // Synchronisation avec la page réservations
+    syncBeerListWithReservations();
 }
 
 // **Met à jour l'affichage de l'inventaire**
 function updateInventoryDisplay() {
     const tableBody = document.getElementById('inventoryTableBody');
     const beerStock = getBeerStock();
+    const weekStartInput = document.getElementById("weekStartDate").value;
+    const selectedMonday = new Date(weekStartInput);
+
     tableBody.innerHTML = '';
 
     for (const [beerType, item] of Object.entries(beerStock)) {
-        const stockReserved = getBeerStockUsedThisWeek(beerType);
+        const stockReserved = getBeerStockUsedThisWeek(beerType, selectedMonday);
         const stockReal = item.stock - stockReserved;
 
         const row = document.createElement('tr');
@@ -46,7 +55,6 @@ function updateInventoryDisplay() {
         tableBody.appendChild(row);
     }
 
-    // Ajout des événements pour modifier/supprimer un fût
     document.querySelectorAll('.edit-stock').forEach(button => {
         button.addEventListener('click', editStockTheorique);
     });
@@ -105,18 +113,15 @@ function syncBeerListWithReservations() {
     localStorage.setItem('allBeers', JSON.stringify(Object.keys(getBeerStock())));
 }
 
-// **Calcule la quantité de fûts réservée sur la semaine en cours**
-function getBeerStockUsedThisWeek(beerType) {
+// **Calcule la quantité de fûts réservée pour une semaine donnée**
+function getBeerStockUsedThisWeek(beerType, weekStartDate) {
     const reservations = getReservations();
-    const today = new Date();
-    
-    // Définir la plage de la semaine (lundi - dimanche)
-    const startOfWeek = new Date(today);
-    startOfWeek.setDate(today.getDate() - today.getDay() + 1);
+
+    const startOfWeek = new Date(weekStartDate);
     startOfWeek.setHours(0, 0, 0, 0);
 
     const endOfWeek = new Date(startOfWeek);
-    endOfWeek.setDate(startOfWeek.getDate() + 6);
+    endOfWeek.setDate(startOfWeek.getDate() + 13);
     endOfWeek.setHours(23, 59, 59, 999);
 
     return reservations.reduce((total, reservation) => {
@@ -131,7 +136,15 @@ function getBeerStockUsedThisWeek(beerType) {
     }, 0);
 }
 
-// **Mise à jour des équipements (Barnum et Borne Photo)**
+// **Récupère le lundi de la semaine en cours**
+function getMonday(date) {
+    date = new Date(date);
+    const day = date.getDay();
+    const diff = date.getDate() - day + (day === 0 ? -6 : 1);
+    return new Date(date.setDate(diff));
+}
+
+// **Mise à jour des équipements**
 function updateEquipmentDisplay() {
     const reservations = getReservations();
 
@@ -168,14 +181,12 @@ function updateEquipmentDisplay() {
     document.getElementById('barnum3x3-dates').textContent = barnum3x3Dates.length ? barnum3x3Dates.join(' / ') : '-';
     document.getElementById('barnum3x6-dates').textContent = barnum3x6Dates.length ? barnum3x6Dates.join(' / ') : '-';
     document.getElementById('photobooth-dates').textContent = photoboothDates.length ? photoboothDates.join(' / ') : '-';
+
 }
 
-// **Formate une date au format jj-mm-aaaa**
+// **Formate une date**
 function formatDate(dateString) {
     if (!dateString) return '-';
     const [year, month, day] = dateString.split('-');
     return `${day}-${month}-${year}`;
 }
-
-// **Mise à jour des équipements au chargement**
-document.addEventListener('DOMContentLoaded', updateEquipmentDisplay);
