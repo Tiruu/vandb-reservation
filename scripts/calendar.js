@@ -84,7 +84,7 @@ async function updateCalendar() {
         allTaps[tapType].forEach(tapNumber => {
             const tr = document.createElement('tr');
             const tdName = document.createElement('td');
-            tdName.textContent = `${tapType} ${tapNumber}`;
+            tdName.textContent = `${tapNumber}`;
             tr.appendChild(tdName);
 
             for (let day = 1; day <= lastDay.getDate(); day++) {
@@ -108,7 +108,7 @@ async function updateCalendar() {
                     } else {
                         td.classList.add('reserved'); // ✅ Green for normal reservations
                     }
-                    td.textContent = "📅";
+                    td.textContent = "";
                     td.title = dayReservations.map(res => `${res.clientName} - ${res.beers[0].type}`).join("\n");
                     td.addEventListener("click", () => showReservationsModal(dayReservations, date));
                 }

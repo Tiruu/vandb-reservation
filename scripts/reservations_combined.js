@@ -1,4 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Add reservation status styling
+    addBootstrapCompatibleStyles();
+    
     updateReservationsDisplay();
 
     const addReservationBtn = document.getElementById('addReservationBtn');
@@ -18,21 +21,102 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const startDateInput = document.getElementById('startDate');
     if (startDateInput) {
-        startDateInput.addEventListener('change', generateTapSelect);
+        startDateInput.addEventListener('change', () => {
+            generateTapSelect();
+            updateEquipmentAvailability(startDateInput.value, document.getElementById('endDate').value, currentEditingId);
+        });
     }
 
     const endDateInput = document.getElementById('endDate');
     if (endDateInput) {
-        endDateInput.addEventListener('change', generateTapSelect);
+        endDateInput.addEventListener('change', () => {
+            generateTapSelect();
+            updateEquipmentAvailability(document.getElementById('startDate').value, endDateInput.value, currentEditingId);
+        });
+    }
+    
+    // Add beer entry button
+    const addBeerBtn = document.getElementById('addBeer');
+    if (addBeerBtn) {
+        addBeerBtn.addEventListener('click', () => addBeerEntry());
     }
 
-    document.getElementById('startDate').addEventListener('change', () => {
-        updateEquipmentAvailability(startDateInput.value, endDateInput.value, currentEditingId);
-    });
-    document.getElementById('endDate').addEventListener('change', () => {
-        updateEquipmentAvailability(startDateInput.value, endDateInput.value, currentEditingId);
-    });
+    // Initialiser les accordéons si nécessaire
+    const accordionElements = document.querySelectorAll('.accordion-collapse');
+    if (accordionElements.length > 0) {
+        accordionElements.forEach(element => {
+            const accordion = new bootstrap.Collapse(element, {
+                toggle: false
+            });
+        });
+    }
 });
+/**
+ * Adds custom styles that work with Bootstrap's CSS architecture
+ */
+function addBootstrapCompatibleStyles() {
+    const styleElement = document.createElement('style');
+    styleElement.textContent = `
+        /* Target Bootstrap's custom property mechanism */
+        tr.reservation-active {
+            --bs-table-accent-bg: rgba(25, 135, 84, 0.15) !important;
+            --bs-table-bg-type: rgba(25, 135, 84, 0.15) !important;
+            --bs-table-bg-state: rgba(25, 135, 84, 0.15) !important;
+            --bs-table-bg: rgba(25, 135, 84, 0.15) !important;
+        }
+        
+        tr.reservation-expired {
+            --bs-table-accent-bg: rgba(220, 53, 69, 0.15) !important;
+            --bs-table-bg-type: rgba(220, 53, 69, 0.15) !important;
+            --bs-table-bg-state: rgba(220, 53, 69, 0.15) !important;
+            --bs-table-bg: rgba(220, 53, 69, 0.15) !important;
+        }
+        
+        /* Override the box-shadow approach as well for maximum compatibility */
+        tr.reservation-active > *,
+        tr.reservation-expired > * {
+            box-shadow: none !important;
+        }
+        
+        /* Apply direct background-color as a fallback */
+        tr.reservation-active > * {
+            background-color: rgba(25, 135, 84, 0.15) !important;
+        }
+        
+        tr.reservation-expired > * {
+            background-color: rgba(220, 53, 69, 0.15) !important;
+        }
+    `;
+    document.head.appendChild(styleElement);
+}
+
+
+
+/**
+ * Determines the status of a reservation based on its dates
+ * @param {Object} reservation - The reservation object
+ * @returns {string} - The status class name
+ */
+function getReservationStatusClass(reservation) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Reset time to start of day for accurate comparison
+    
+    const startDate = new Date(reservation.startDate);
+    const endDate = new Date(reservation.endDate);
+    
+    // If end date has passed, reservation is expired
+    if (endDate < today) {
+        return 'reservation-expired';
+    }
+    
+    // If start date has passed but end date hasn't, reservation is active
+    if (startDate <= today && endDate >= today) {
+        return 'reservation-active';
+    }
+    
+    // Otherwise, it's an upcoming reservation
+    return '';
+}
 
 // **LISTE DES TIREUSES ET FUTS DISPONIBLES**
 const allTaps = {
@@ -47,10 +131,69 @@ const allTaps = {
 
 let currentEditingId = null;
 
+// Récupère la liste des bières dynamiquement depuis le stockage
+function getBeerList() {
+    // Récupère la liste des bières, sinon initialise avec un stock de base
+    return JSON.parse(localStorage.getItem('allBeers')) || [
+        "Celt Pils 30L",
+        "Levrette Cerise 20L",
+        "Kapitell Watou 20L",
+        "Krombacher 30L",
+        "Vedett IPA 20L"
+    ];
+}
+
+// Helper function to generate beer select options HTML
+function generateBeerSelectOptions(currentBeerType = null) {
+    const allBeers = getBeerList();
+    return `<option value="" selected>Choisir un type de fût...</option>` +
+        allBeers.map(beer => `<option value="${beer}" ${beer === currentBeerType ? 'selected' : ''}>${beer}</option>`).join('');
+}
+
+// Function to add a new beer entry row
+function addBeerEntry(beerType = '', beerQuantity = 1) {
+    const beerContainer = document.getElementById('beerContainer');
+    
+    if (!beerContainer) {
+        console.error("Beer container not found!");
+        return;
+    }
+    
+    const beerEntry = document.createElement('div');
+    beerEntry.classList.add('beer-entry', 'row', 'mb-2');
+    
+    beerEntry.innerHTML = `
+        <div class="col-md-5">
+            <select class="form-select beerType">
+                ${generateBeerSelectOptions(beerType)}
+            </select>
+        </div>
+        <div class="col-md-4">
+            <input type="number" class="form-control beerQuantity" value="${beerQuantity}" min="1">
+        </div>
+        <div class="col-md-3">
+            <button type="button" class="btn btn-danger removeBeer">Supprimer</button>
+        </div>
+    `;
+
+    beerContainer.appendChild(beerEntry);
+
+    // Add event listener to remove button
+    beerEntry.querySelector('.removeBeer').addEventListener('click', () => {
+        beerEntry.remove();
+    });
+}
+
 function openNewReservationModal(reservationId = null) {
     console.log("Modal ouvert avec ID:", reservationId);
     const modalTitle = document.getElementById('modalTitle');
     const form = document.getElementById('reservationForm');
+    const beerContainer = document.getElementById('beerContainer');
+    
+    // Clear existing beer entries
+    if (beerContainer) {
+        beerContainer.innerHTML = '';
+    }
 
     if (reservationId) {
         const reservations = getReservations();
@@ -65,8 +208,17 @@ function openNewReservationModal(reservationId = null) {
         form.tapType.value = reservation.tapType;
         generateTapSelect(reservation.tapNumber);
         form.tapNumber.value = reservation.tapNumber;
-        generateBeerSelect(reservation.beers[0].type);
-        form.beerQuantity.value = reservation.beers[0].quantity;
+        
+        // Add beer entries for each beer in the reservation
+        if (reservation.beers && reservation.beers.length > 0) {
+            reservation.beers.forEach(beer => {
+                addBeerEntry(beer.type, beer.quantity);
+            });
+        } else {
+            // Add at least one empty beer entry
+            addBeerEntry();
+        }
+        
         form.barnumOption.checked = reservation.barnumOption;
         form.barnum2Option.checked = reservation.barnum2Option;
         form.photoBoothOption.checked = reservation.photoBoothOption;
@@ -84,7 +236,9 @@ function openNewReservationModal(reservationId = null) {
         modalTitle.textContent = "Nouvelle Réservation";
         form.reset();
         currentEditingId = null;
-        generateBeerSelect();
+        
+        // Add one empty beer entry for new reservations
+        addBeerEntry();
 
         const annualCheckbox = document.getElementById('annualReservation');
         if (annualCheckbox) {
@@ -98,7 +252,6 @@ function openNewReservationModal(reservationId = null) {
     let modal = new bootstrap.Modal(document.getElementById('reservationModal'));
     modal.show();
 }
-
 
 function getReservations() {
     return JSON.parse(localStorage.getItem('reservations') || '[]');
@@ -116,7 +269,16 @@ function handleReservationSubmit() {
     }
 
     const annualCheckbox = document.getElementById('annualReservation');
-    const isAnnual = annualCheckbox ? annualCheckbox.checked : false; // ✅ Prevents null error
+    const isAnnual = annualCheckbox ? annualCheckbox.checked : false;
+
+    // Retrieve multiple beer selections
+    const beerEntries = document.querySelectorAll('.beer-entry');
+    const beers = Array.from(beerEntries).map(entry => {
+        return {
+            type: entry.querySelector('.beerType').value,
+            quantity: parseInt(entry.querySelector('.beerQuantity').value, 10) || 1
+        };
+    }).filter(beer => beer.type !== ''); // Remove empty selections
 
     const reservation = {
         id: currentEditingId || Date.now().toString(),
@@ -126,12 +288,12 @@ function handleReservationSubmit() {
         endDate: form.endDate.value,
         tapType: form.tapType.value,
         tapNumber: form.tapNumber.value,
-        beers: [{ type: form.beerType.value, quantity: parseInt(form.beerQuantity.value, 10) }],
+        beers: beers, // Multiple beer entries
         barnumOption: form.barnumOption.checked,
         barnum2Option: form.barnum2Option.checked,
         photoBoothOption: form.photoBoothOption.checked,
         comment: form.comment.value,
-        isAnnual: isAnnual // ✅ Prevents crash if checkbox is missing
+        isAnnual: isAnnual
     };
 
     let reservations = getReservations();
@@ -141,30 +303,10 @@ function handleReservationSubmit() {
         reservations.push(reservation);
     }
 
-    if (!form.clientName.value.trim()) {
-        alert("Veuillez entrer le nom du client.");
-        return;
-    }
-    if (!form.startDate.value) {
-        alert("Veuillez sélectionner une date de début.");
-        return;
-    }
-    if (!form.endDate.value) {
-        alert("Veuillez sélectionner une date de fin.");
-        return;
-    }
-    if (form.tapType.value && !form.tapNumber.value) {
-        alert("Veuillez sélectionner un numéro de tireuse.");
-        return;
-    }
-
     saveReservations(reservations);
     updateReservationsDisplay();
-
     bootstrap.Modal.getInstance(document.getElementById('reservationModal')).hide();
 }
-
-
 
 function formatDate(dateString) {
     if (!dateString) return "-"; // Evite les erreurs si la date est vide
@@ -173,36 +315,75 @@ function formatDate(dateString) {
 }
 
 function updateReservationsDisplay() {
-    const tableBody = document.getElementById('reservationsTableBody');
-    tableBody.innerHTML = '';
+    const annualTableBody = document.getElementById('annualReservationsTableBody');
+    const regularTableBody = document.getElementById('regularReservationsTableBody');
+    
+    // Vider les tableaux
+    annualTableBody.innerHTML = '';
+    regularTableBody.innerHTML = '';
 
     const reservations = getReservations();
     reservations.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
 
-    if (reservations.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="9" class="text-center">Aucune réservation disponible</td></tr>';
-        return;
+    // Filtrer les réservations par type
+    const annualReservations = reservations.filter(r => r.isAnnual);
+    const regularReservations = reservations.filter(r => !r.isAnnual);
+
+    // Afficher un message si aucune réservation annuelle
+    if (annualReservations.length === 0) {
+        annualTableBody.innerHTML = '<tr><td colspan="10" class="text-center">Aucune réservation annuelle disponible</td></tr>';
+    } else {
+        // Remplir le tableau des réservations annuelles
+        annualReservations.forEach(reservation => {
+            const row = createReservationRow(reservation);
+            annualTableBody.appendChild(row);
+        });
     }
 
-    reservations.forEach(reservation => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${reservation.isAnnual ? "Annuelle" : ""}</td>
-            <td>${reservation.clientName}</td>
-            <td>${reservation.clientPhone || '-'}</td>
-            <td>${formatDate(reservation.startDate)}</td>
-            <td>${formatDate(reservation.endDate)}</td>
-            <td>${reservation.tapType} ${reservation.tapNumber}</td>
-            <td>${reservation.beers.map(beer => `${beer.quantity} × ${beer.type}`).join('<br>')}</td>
-            <td>${reservation.barnumOption ? "Barnum 3x3" : ""} ${reservation.barnum2Option ? "Barnum 3x6" : ""} ${reservation.photoBoothOption ? "Borne Photo" : ""}</td>
-            <td>${reservation.comment || "-"}</td>
-            <td>
-                <button class="btn btn-sm btn-primary" onclick="openNewReservationModal('${reservation.id}')">Modifier</button>
-                <button class="btn btn-sm btn-danger" onclick="deleteReservation('${reservation.id}')">Supprimer</button>
-            </td>
-        `;
-        tableBody.appendChild(row);
-    });
+    // Afficher un message si aucune réservation classique
+    if (regularReservations.length === 0) {
+        regularTableBody.innerHTML = '<tr><td colspan="10" class="text-center">Aucune réservation classique disponible</td></tr>';
+    } else {
+        // Remplir le tableau des réservations classiques
+        regularReservations.forEach(reservation => {
+            const row = createReservationRow(reservation);
+            regularTableBody.appendChild(row);
+        });
+    }
+
+    // Mettre à jour les badges de comptage
+    const annualButton = document.querySelector('#annualReservationsHeader button');
+    const regularButton = document.querySelector('#regularReservationsHeader button');
+    
+    annualButton.innerHTML = `Réservations Annuelles <span class="badge bg-success ms-2">${annualReservations.length}</span>`;
+    regularButton.innerHTML = `Réservations Classiques <span class="badge bg-primary ms-2">${regularReservations.length}</span>`;
+}
+
+// Fonction utilitaire pour créer une ligne de réservation
+function createReservationRow(reservation) {
+    const row = document.createElement('tr');
+    
+    // Add the appropriate status class
+    const statusClass = getReservationStatusClass(reservation);
+    if (statusClass) {
+        row.classList.add(statusClass);
+    }
+    
+    row.innerHTML = `
+        <td>${reservation.clientName}</td>
+        <td>${reservation.clientPhone || '-'}</td>
+        <td>${formatDate(reservation.startDate)}</td>
+        <td>${formatDate(reservation.endDate)}</td>
+        <td>${reservation.tapType} ${reservation.tapNumber}</td>
+        <td>${reservation.beers.map(beer => `${beer.quantity} × ${beer.type}`).join('<br>')}</td>
+        <td>${reservation.barnumOption ? "Barnum 3x3" : ""} ${reservation.barnum2Option ? "Barnum 3x6" : ""} ${reservation.photoBoothOption ? "Borne Photo" : ""}</td>
+        <td>${reservation.comment || "-"}</td>
+        <td>
+            <button class="btn btn-sm btn-primary" onclick="openNewReservationModal('${reservation.id}')">Modifier</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteReservation('${reservation.id}')">Supprimer</button>
+        </td>
+    `;
+    return row;
 }
 
 // **SUPPRESSION D'UNE RÉSERVATION**
@@ -211,32 +392,6 @@ function deleteReservation(reservationId) {
     reservations = reservations.filter(reservation => reservation.id !== reservationId);
     saveReservations(reservations);
     updateReservationsDisplay();
-}
-
-// Récupère la liste des bières dynamiquement depuis le stockage
-function getBeerList() {
-    // Récupère la liste des bières, sinon initialise avec un stock de base
-    return JSON.parse(localStorage.getItem('allBeers')) || [
-        "Celt Pils 30L",
-        "Levrette Cerise 20L",
-        "Kapitell Watou 20L",
-        "Krombacher 30L",
-        "Vedett IPA 20L"
-    ];
-}
-
-function generateBeerSelect(currentBeerType = null) {
-    const beerSelect = document.getElementById('beerType');
-    const allBeers = getBeerList();
-
-    if (!beerSelect) return; // Vérification de l'élément existant
-
-    beerSelect.innerHTML = '<option value="" selected>Choisir un type de fût...</option>' +
-        allBeers.map(beer => `<option value="${beer}">${beer}</option>`).join('');
-
-    if (currentBeerType && allBeers.includes(currentBeerType)) {
-        beerSelect.value = currentBeerType;
-    }
 }
 
 function generateTapSelect(currentTapNumber = null) {
@@ -259,7 +414,7 @@ function generateTapSelect(currentTapNumber = null) {
             r.endDate < startDate || 
             r.startDate > endDate
         ) &&
-        r.tapNumber !== currentTapNumber // Autoriser la tireuse déjà sélectionnée
+        r.id !== currentEditingId // Ne pas compter la réservation en cours d'édition
     ).map(r => r.tapNumber));
 
     // Trier les tireuses disponibles et réservées
@@ -322,6 +477,3 @@ function updateEquipmentAvailability(startDate, endDate, currentReservationId = 
     document.getElementById('barnum2Option').disabled = barnum3x6Reserved;
     document.getElementById('photoBoothOption').disabled = photoBoothReserved;
 }
-
-
-

@@ -29,12 +29,19 @@
     padding: 0px;
     text-align: center;
     font-size: 14px;
+    border: 1px solid #bebebe; /* Light gray Bootstrap border */
 }
 
 /* ✅ Colorer les cases avec réservations en vert */
 td.reserved {
     background-color: #28a745; /* Vert Bootstrap */
-    color: white;
+    color: white !important;
+    font-weight: bold;
+    cursor: pointer;
+}
+td.annual-reserved {
+    background-color: #28a745; /* Vert Bootstrap */
+    color: white !important;
     font-weight: bold;
     cursor: pointer;
 }
@@ -80,3 +87,66 @@ td.reserved::after {
     color: white;
 }
 
+.container-fluid {
+    padding-left: 50px;
+    padding-right: 50px;
+}
+
+/* Style pour les accordéons de réservation */
+#annualReservationsHeader .accordion-button {
+    background-color: rgba(25, 135, 84, 0.1); /* Teinte verte légère */
+    border-left: 4px solid #198754; /* Bordure verte */
+}
+
+#regularReservationsHeader .accordion-button {
+    background-color: rgba(13, 110, 253, 0.1); /* Teinte bleue légère */
+    border-left: 4px solid #0d6efd; /* Bordure bleue */
+}
+
+.accordion-button:not(.collapsed) {
+    box-shadow: none; /* Enlever l'ombre par défaut */
+    font-weight: bold;
+}
+
+/* Style pour les tableaux */
+#annualReservationsTableBody tr {
+    background-color: rgba(25, 135, 84, 0.03); /* Très légère teinte verte */
+}
+
+/* Survol des lignes */
+.table tbody tr:hover {
+    background-color: rgba(0, 0, 0, 0.075);
+}
+
+
+/* Style for the tables */
+.table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+/* Borders for table headers and cells */
+.table th, 
+.table td {
+    border: 1px solid #ffffffa9; /* Light gray Bootstrap border */
+    padding: 8px; /* Adjust padding for better readability */
+    text-align: center;
+    vertical-align: middle; /* Center text vertically */
+}
+
+/* Add background for header */
+.table thead th {
+    background-color: #f8f9fa; /* Light background for headers */
+    font-weight: bold;
+    border-bottom: 2px solid #adb5bd; /* Thicker bottom border */
+}
+
+/* Alternate row colors for better readability */
+.table-striped tbody tr:nth-child(odd) {
+    background-color: #f9f9f9;
+}
+
+/* Hover effect for better UX */
+.table tbody tr:hover {
+    background-color: rgba(0, 0, 0, 0.075);
+}
