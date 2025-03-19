@@ -1,4 +1,4 @@
-const API_URL = "https://my-cloudflare-app.lino-bckp.workers.dev"; // Remplace par ton vrai URL de Worker
+const API_URL = "https://31e2c60e-my-cloudflare-app.lino-bckp.workers.dev"; // Remplace par ton vrai URL de Worker
 
 // Récupérer toutes les réservations
 async function getReservations() {
