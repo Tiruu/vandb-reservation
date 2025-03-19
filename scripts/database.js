@@ -29,3 +29,5 @@ async function updateInventory(inventoryItem) {
         body: JSON.stringify(inventoryItem)
     });
 }
+
+//async
