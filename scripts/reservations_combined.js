@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     // Add reservation status styling
     addBootstrapCompatibleStyles();
-    
     updateReservationsDisplay();
 
     const addReservationBtn = document.getElementById('addReservationBtn');
@@ -257,11 +256,16 @@ function getReservations() {
     return JSON.parse(localStorage.getItem('reservations') || '[]');
 }
 
-function saveReservations(reservations) {
-    localStorage.setItem('reservations', JSON.stringify(reservations));
+async function saveReservation(reservation) {
+    await fetch("https://31e2c60e-my-cloudflare-app.lino-bckp.workers.dev/reservations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(reservation)
+    });
 }
 
-function handleReservationSubmit() {
+
+async function handleReservationSubmit() {
     const form = document.getElementById('reservationForm');
     if (!form) {
         console.error("ERROR: Reservation form not found!");
@@ -303,7 +307,7 @@ function handleReservationSubmit() {
         reservations.push(reservation);
     }
 
-    saveReservations(reservations);
+    await saveReservation(reservation);
     updateReservationsDisplay();
     bootstrap.Modal.getInstance(document.getElementById('reservationModal')).hide();
 }
