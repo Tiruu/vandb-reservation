@@ -1,0 +1,156 @@
+/* 🌍 Scrollbar horizontale en haut */
+.table-responsive {
+    position: relative;
+}
+
+.scroll-wrapper {
+    overflow-x: auto;
+    white-space: nowrap;
+    margin-bottom: 10px;
+}
+
+#calendarTable {
+    min-width: 100%;
+    border-collapse: collapse;
+}
+
+/* 🏷️ Agrandir la colonne des tireuses */
+#calendarTable th:first-child,
+#calendarTable td:first-child {
+    padding-left: 5px;
+    min-width: 180px; /* Augmenter la largeur */
+    white-space: nowrap; /* Empêcher le retour à la ligne */
+    text-align: left;
+    font-weight: bold;
+}
+
+/* 📏 Réduire la hauteur des lignes */
+#calendarTable th, #calendarTable td {
+    padding: 0px;
+    text-align: center;
+    font-size: 14px;
+    border: 1px solid #bebebe; /* Light gray Bootstrap border */
+}
+
+/* ✅ Colorer les cases avec réservations en vert */
+td.reserved {
+    background-color: #28a745; /* Vert Bootstrap */
+    color: white !important;
+    font-weight: bold;
+    cursor: pointer;
+}
+td.annual-reserved {
+    background-color: #28a745; /* Vert Bootstrap */
+    color: white !important;
+    font-weight: bold;
+    cursor: pointer;
+}
+td.archived {
+    background-color: #4d4d4d; /* Vert Bootstrap */
+    color: white !important;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* ✅ Améliorer l'affichage des icônes calendrier */
+td.reserved::after {
+    content: "";
+    font-size: 16px;
+}
+
+/* Ensures the today column is clearly visible */
+/* Highlight the entire column for today, but not the green boxes */
+#calendarTable th.today-column,
+#calendarTable td.today-column:not(.reserved) {
+    background-color: gold !important; /* Gold for empty cells */
+    font-weight: bold !important;
+}
+
+/* Ensure reserved (green) cells remain unchanged */
+#calendarTable td.today-column.reserved {
+    background-color: #28a745 !important; /* Keep green */
+    color: white !important;
+}
+#calendarTable td.today-column.annual-reserved {
+    background-color: blue !important;
+    color: white !important;
+}
+#calendarTable td.today-column.archived {
+    background-color: blue !important;
+    color: white !important;
+}
+
+/* 🔶 Highlight today's column */
+.today-column {
+    background-color: gold !important;
+}
+
+/* 🔵 Annual reservations in blue */
+.annual-reserved {
+    background-color: blue !important;
+    color: white;
+}
+
+/* ✅ Normal reservations in green */
+.reserved {
+    background-color: #28a745 !important;
+    color: white;
+}
+.archived{
+    background-color: #3b3b3b !important;
+    color: white;
+}
+
+.container-fluid {
+    padding-left: 50px;
+    padding-right: 50px;
+}
+
+/* Style pour les accordéons de réservation */
+#regularReservationsHeader .accordion-button {
+    background-color: rgba(25, 135, 84, 0.1); /* Teinte verte légère */
+    border-left: 4px solid #198754; /* Bordure verte */
+}
+
+#annualReservationsHeader .accordion-button {
+    background-color: rgba(13, 110, 253, 0.1); /* Teinte bleue légère */
+    border-left: 4px solid #0d6efd; /* Bordure bleue */
+}
+
+#archivedReservationsHeader .accordion-button {
+    background-color: rgba(237, 253, 13, 0.1);
+    border-left: 4px solid #fbff24; /* Bordure bleue */
+}
+
+.accordion-button:not(.collapsed) {
+    box-shadow: none; /* Enlever l'ombre par défaut */
+    font-weight: bold;
+}
+
+
+/* Style for the tables */
+.table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+/* Borders for table headers and cells */
+.table th, 
+.table td {
+    border: 1px solid #ffffffa9; /* Light gray Bootstrap border */
+    padding: 8px; /* Adjust padding for better readability */
+    text-align: center;
+    vertical-align: middle; /* Center text vertically */
+}
+
+/* Add background for header */
+.table thead th {
+    background-color: #f8f9fa; /* Light background for headers */
+    font-weight: bold;
+    border-bottom: 2px solid #adb5bd; /* Thicker bottom border */
+}
+
+/* Alternate row colors for better readability */
+.table-striped tbody tr:nth-child(odd) {
+    background-color: #f9f9f9;
+}
