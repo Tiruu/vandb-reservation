@@ -483,12 +483,16 @@ const CONFIG = {
       const today = new Date();
       today.setHours(0, 0, 0, 0); // Reset time to start of day for accurate comparison
 
-      const startDate = new Date(reservation.startDate);
-      const endDate = new Date(reservation.endDate);
+      const startDate = new Date(`${reservation.startDate}T00:00:00`);
+      const endDate = new Date(`${reservation.endDate}T23:59:59`);
 
       // If end date has passed, reservation is expired
       if (endDate < today) {
         return CONFIG.RESERVATION_STATUS.EXPIRED;
+      }
+
+     if (startDate <= today) {
+        return CONFIG.RESERVATION_STATUS.ACTIVE;
       }
 
       // If start date has passed but end date hasn't, reservation is active

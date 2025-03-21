@@ -459,16 +459,11 @@ async function deleteBeerType(event) {
  * ------------------------------------------------------------------------
  */
 
-/**
- * Calculates the amount of a specific beer type reserved over a two-week period.
- *
- * @param {string} beerType - The type of beer to check
- * @param {Date} startDate - The start date of the period
- * @returns {Promise<number>} The total quantity reserved
- */
 async function getBeerStockUsedOverTwoWeeks(beerType, startDate) {
   try {
     const reservations = await getReservations();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Normalize today's date to ignore time
 
     // Define the two-week period
     const startOfPeriod = new Date(startDate);
@@ -478,19 +473,24 @@ async function getBeerStockUsedOverTwoWeeks(beerType, startDate) {
     endOfPeriod.setDate(startOfPeriod.getDate() + 13); // Two weeks (14 days)
     endOfPeriod.setHours(23, 59, 59, 999);
 
-    // Calculate total reserved quantity
     return reservations.reduce((total, reservation) => {
-      // Skip if beers array is invalid
+      // Skip invalid beer data
       if (!Array.isArray(reservation.beers)) {
         return total;
       }
 
-      // Check if reservation is within the period
       const resStartDate = new Date(reservation.startDate);
+      const resEndDate = new Date(reservation.endDate);
       resStartDate.setHours(0, 0, 0, 0);
+      resEndDate.setHours(23, 59, 59, 999);
 
+      // **Exclude reservations that have already ended**
+      if (resEndDate < today) {
+        return total;
+      }
+
+      // Include only reservations that fall within the period
       if (resStartDate >= startOfPeriod && resStartDate <= endOfPeriod) {
-        // Find the matching beer type and add its quantity
         const beer = reservation.beers.find(b => b.type.trim() === beerType);
         return beer ? total + (parseInt(beer.quantity, 10) || 0) : total;
       }
@@ -502,6 +502,8 @@ async function getBeerStockUsedOverTwoWeeks(beerType, startDate) {
     return 0;
   }
 }
+
+
 
 /**
  * Safely parses a beer JSON string into an array.

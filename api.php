@@ -39,7 +39,7 @@ if (($requestType === 'POST' || $requestType === 'PUT') && $queryType !== 'archi
 Reservation fetch
 ======================= */
 if ($queryType === 'reservations' && $requestType === 'GET') {
-    $sql = "SELECT * FROM reservations";
+    $sql = "SELECT * FROM reservations ORDER BY startDate ASC";
     $result = $conn->query($sql);
 
     if (!$result) {
@@ -231,7 +231,7 @@ if ($queryType === 'archiveAndDelete' && $requestType === 'POST' && isset($_GET[
 }
 
 if ($queryType === 'archives' && $requestType === 'GET') {
-    $sql = "SELECT * FROM archives";
+    $sql = "SELECT * FROM archives ORDER BY startDate ASC";
     $result = $conn->query($sql);
 
     if (!$result) {
