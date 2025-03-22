@@ -485,7 +485,7 @@ async function getBeerStockUsedOverTwoWeeks(beerType, startDate) {
       resEndDate.setHours(23, 59, 59, 999);
 
       // **Exclude reservations that have already ended**
-      if (resEndDate < today) {
+      if (resStartDate < today) {
         return total;
       }
 

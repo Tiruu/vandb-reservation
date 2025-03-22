@@ -345,11 +345,11 @@ const CONFIG = {
        * @type {Object}
        */
       this.allTaps = {
-        'FS': ['FS 1', 'FS 2', 'FS 3', 'FS 4', 'FS 5', 'FS 6', 'FS 7', 'FS 8', 'FS 9', 'FS 10'],
-        'T1': ['T1-1', 'T1-2', 'T1-3', 'T1-4', 'T1-5', 'T1-6', 'T1-7', 'T1-8', 'T1-9', 'T1-10', 'T1-11', 'T1-12', 'T1-13', 'T1-14', 'T1-15'],
-        'T2': ['T2-1', 'T2-2', 'T2-3', 'T2-4'],
-        'Tonneau': ['Tonneau 1', 'Tonneau 2', 'Tonneau 3'],
-        'Bertha': ['Bertha 1', 'Bertha 2'],
+        'FS': Array.from({ length: 10 }, (_, i) => `FS ${i + 1}`),
+        'T1': Array.from({ length: 15 }, (_, i) => `T1-${i + 1}`),
+        'T2': Array.from({ length: 4 }, (_, i) => `T2-${i + 1}`),
+        'Tonneau': Array.from({ length: 3 }, (_, i) => `Tonneau ${i + 1}`),
+        'Bertha': Array.from({ length: 2 }, (_, i) => `Bertha ${i + 1}`),
         'Festoche': ['Festoche 1'],
         'Picolo': ['Picolo 1']
       };
