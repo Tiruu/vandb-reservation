@@ -41,7 +41,7 @@
         'T2': Array.from({ length: 4 }, (_, i) => `T2-${i + 1}`),
         'Tonneau': Array.from({ length: 3 }, (_, i) => `Tonneau ${i + 1}`),
         'Bertha': Array.from({ length: 2 }, (_, i) => `Bertha ${i + 1}`),
-        'Festoche': ['Festoche 1'],
+        'Festoche': Array.from({ length: 2 }, (_, i) => `Festoche ${i + 1}`),
         'Picolo': ['Picolo 1']
     };
 
@@ -208,13 +208,24 @@
                         cell.classList.add(cssClasses.todayColumn);
                     }
                     
-                    // Find reservations for this equipment on this day
-                    const dayReservations = reservations.filter(res => 
-                        res.tapType === tapType &&
-                        res.tapNumber === tapNumber &&
-                        new Date(res.startDate) <= date &&
-                        new Date(res.endDate) >= date
-                    );
+                   const dayReservations = reservations.filter(res => {
+                   const startDate = new Date(res.startDate);
+    		   const endDate = new Date(res.endDate);
+  		   const normalizedDate = new Date(date);
+
+   		   // Normaliser les dates (éviter problèmes de fuseau horaire)
+    		   startDate.setHours(0, 0, 0, 0);
+    		   endDate.setHours(0, 0, 0, 0);
+    		   normalizedDate.setHours(0, 0, 0, 0);
+
+   		 return (
+       		 	res.tapType === tapType &&
+        		res.tapNumber === tapNumber &&
+       		 	startDate <= normalizedDate &&
+       		 	endDate >= normalizedDate
+    			);
+		});
+
                     
                     // If there are reservations, style the cell accordingly
                     if (dayReservations.length > 0) {

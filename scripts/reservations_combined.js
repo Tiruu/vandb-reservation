@@ -350,7 +350,7 @@ const CONFIG = {
         'T2': Array.from({ length: 4 }, (_, i) => `T2-${i + 1}`),
         'Tonneau': Array.from({ length: 3 }, (_, i) => `Tonneau ${i + 1}`),
         'Bertha': Array.from({ length: 2 }, (_, i) => `Bertha ${i + 1}`),
-        'Festoche': ['Festoche 1'],
+        'Festoche': Array.from({ length: 2 }, (_, i) => `Festoche ${i + 1}`),
         'Picolo': ['Picolo 1']
       };
 
