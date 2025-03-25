@@ -345,7 +345,7 @@ const CONFIG = {
        * @type {Object}
        */
       this.allTaps = {
-        'FS': Array.from({ length: 10 }, (_, i) => `FS ${i + 1}`),
+        'FS': Array.from({ length: 10 }, (_, i) => `FS-${i + 1}`),
         'T1': Array.from({ length: 15 }, (_, i) => `T1-${i + 1}`),
         'T2': Array.from({ length: 4 }, (_, i) => `T2-${i + 1}`),
         'Tonneau': Array.from({ length: 3 }, (_, i) => `Tonneau ${i + 1}`),
@@ -359,8 +359,7 @@ const CONFIG = {
        * @type {string|null}
        */
       this.currentEditingId = null;
-
-      // Initialize the UI components
+      this.tapEntries = []; // to keep track of all tap entries
       this.initStyles();
     }
 
@@ -371,6 +370,7 @@ const CONFIG = {
       this.updateReservationsDisplay();
       this.loadReservations();
       this.setupEventListeners();
+      this.addTapEntry(); // Automatically add the first set of tap selectors
     }
 
     /**
@@ -426,6 +426,12 @@ const CONFIG = {
         addBeerBtn.addEventListener('click', () => this.addBeerEntry());
       }
 
+      // Add tap entry button
+      const addTapBtn = document.getElementById('addTapBtn');
+      if (addTapBtn) {
+        addTapBtn.addEventListener('click', () => this.addTapEntry());
+      }
+
       // Initialize accordions if they exist
       const accordionElements = document.querySelectorAll('.accordion-collapse');
       if (accordionElements.length > 0) {
@@ -443,17 +449,17 @@ const CONFIG = {
       styleElement.textContent = `
         /* Target Bootstrap's custom property mechanism */
         tr.${CONFIG.RESERVATION_STATUS.ACTIVE} {
-          --bs-table-accent-bg: rgba(25, 135, 84, 0.15) !important;
-          --bs-table-bg-type: rgba(25, 135, 84, 0.15) !important;
-          --bs-table-bg-state: rgba(25, 135, 84, 0.15) !important;
-          --bs-table-bg: rgba(25, 135, 84, 0.15) !important;
+          --bs-table-accent-bg: rgba(58, 143, 140, 0.15) !important;
+          --bs-table-bg-type: rgba(58, 143, 140, 0.15) !important;
+          --bs-table-bg-state: rgba(58, 143, 140, 0.15) !important;
+          --bs-table-bg: rgba(58, 143, 140, 0.15) !important;
         }
 
         tr.${CONFIG.RESERVATION_STATUS.EXPIRED} {
-          --bs-table-accent-bg: rgba(220, 53, 69, 0.15) !important;
-          --bs-table-bg-type: rgba(220, 53, 69, 0.15) !important;
-          --bs-table-bg-state: rgba(220, 53, 69, 0.15) !important;
-          --bs-table-bg: rgba(220, 53, 69, 0.15) !important;
+          --bs-table-accent-bg: rgba(233, 96, 41, 0.15) !important;
+          --bs-table-bg-type: rgba(233, 96, 41, 0.15) !important;
+          --bs-table-bg-state: rgba(233, 96, 41, 0.15) !important;
+          --bs-table-bg: rgba(233, 96, 41, 0.15) !important;
         }
 
         /* Override the box-shadow approach for maximum compatibility */
@@ -464,11 +470,11 @@ const CONFIG = {
 
         /* Apply direct background-color as a fallback */
         tr.${CONFIG.RESERVATION_STATUS.ACTIVE} > * {
-          background-color: rgba(25, 135, 84, 0.15) !important;
+          background-color: rgba(58, 143, 140, 0.15) !important;
         }
 
         tr.${CONFIG.RESERVATION_STATUS.EXPIRED} > * {
-          background-color: rgba(220, 53, 69, 0.15) !important;
+          background-color: rgba(233, 96, 41, 0.15 0.15) !important;
         }
       `;
       document.head.appendChild(styleElement);
@@ -574,6 +580,56 @@ const CONFIG = {
     }
 
     /**
+     * Adds a new tap entry directly beneath the last one
+     * @returns {HTMLElement} The created tap entry container
+     */
+    addTapEntry() {
+      // Generating a unique index for each tap entry for better control
+      const tapIndex = this.tapEntries.length;
+
+      // Creating the container for a new tap entry
+      const tapContainer = document.createElement('div');
+      tapContainer.className = 'tap-entry row mt-3';
+      tapContainer.innerHTML = `
+          <div class="col-md-5">
+              <select class="form-select tapType" id="tapType-${tapIndex}">
+                  <option value="">Choisir un type de tireuse...</option>
+                  ${Object.keys(this.allTaps).map(type => `<option value="${type}">${type}</option>`).join('')}
+              </select>
+          </div>
+          <div class="col-md-4">
+              <select class="form-select tapNumber" id="tapNumber-${tapIndex}">
+                  <option value="">Choisir une tireuse...</option>
+              </select>
+          </div>
+          <div class="col-md-3 d-flex align-items-center">
+              <button type="button" class="btn btn-danger removeTap">Supprimer</button>
+          </div>
+      `;
+
+      // Get the container for tap entries
+      const tapEntriesContainer = document.getElementById('tapEntriesContainer');
+      tapEntriesContainer.appendChild(tapContainer);
+
+      // Add event listener for tap removal
+      const removeButton = tapContainer.querySelector('.removeTap');
+      removeButton.addEventListener('click', () => {
+          this.removeTapEntry(tapIndex);
+      });
+
+      // Add event listener for tap type selection
+      const tapTypeSelect = tapContainer.querySelector('.tapType');
+      tapTypeSelect.addEventListener('change', () => {
+          const currentIndex = Array.from(tapEntriesContainer.children).indexOf(tapContainer);
+          this.generateTapSelect(currentIndex);
+      });
+
+      // Save this entry in the array for management
+      this.tapEntries.push(tapContainer);
+
+      return tapContainer;
+    }
+    /**
      * Opens the reservation modal for creating or editing
      * @param {string|null} reservationId - ID of reservation to edit
      * @returns {Promise<void>}
@@ -584,65 +640,105 @@ const CONFIG = {
       const modalTitle = document.getElementById('modalTitle');
       const form = document.getElementById('reservationForm');
       const beerContainer = document.getElementById('beerContainer');
+      const tapEntriesContainer = document.getElementById('tapEntriesContainer');
 
-      // Store the current editing ID
-      this.currentEditingId = reservationId;
-
-      // Clear previous beer entries
+      // Clear previous entries
       beerContainer.innerHTML = '';
+      tapEntriesContainer.innerHTML = '';
+      this.tapEntries = []; // Reset tap entries array
+      this.currentEditingId = reservationId;
 
       const reservations = await ApiService.getReservations();
       Utilities.log('Reservations in modal', reservations);
 
       if (!Array.isArray(reservations)) {
-        Utilities.logError('getReservations() did not return an array', reservations);
-        return;
+          Utilities.logError('getReservations() did not return an array', reservations);
+          return;
       }
 
       if (reservationId) {
-        const reservation = reservations.find(r => r.id == reservationId);
+          const reservation = reservations.find(r => r.id === reservationId);
+          if (!reservation) {
+              Utilities.logError('Reservation not found');
+              return;
+          }
 
-        if (!reservation) {
-          Utilities.logError('Reservation not found');
-          return;
-        }
+          // Populate form with reservation data
+          modalTitle.textContent = CONFIG.TRANSLATIONS.EDIT_RESERVATION;
+          form.raisonSociale.value = reservation.raisonSociale;
+          form.clientName.value = reservation.clientName;
+          form.clientPhone.value = reservation.clientPhone;
+          form.startDate.value = reservation.startDate;
+          form.endDate.value = reservation.endDate;
 
-        // Populate form with reservation data
-        modalTitle.textContent = CONFIG.TRANSLATIONS.EDIT_RESERVATION;
-        form.clientName.value = reservation.clientName;
-        form.clientPhone.value = reservation.clientPhone;
-        form.startDate.value = reservation.startDate;
-        form.endDate.value = reservation.endDate;
-        form.tapType.value = reservation.tapType;
+          // Populate taps safely
+          if (reservation.taps && Array.isArray(reservation.taps) && reservation.taps.length > 0) {
+              // Clear the container first to avoid duplicates
+              tapEntriesContainer.innerHTML = '';
+              this.tapEntries = [];
+              
+              // Add each tap entry from the reservation
+              for (let i = 0; i < reservation.taps.length; i++) {
+                  const tap = reservation.taps[i];
+                  this.addTapEntry(); // This adds to this.tapEntries array
+                  
+                  // Get the newly added entry (the last one in the array)
+                  const entry = this.tapEntries[this.tapEntries.length - 1];
+                  const typeSelect = entry.querySelector('.tapType');
+                  const numberSelect = entry.querySelector('.tapNumber');
+                  
+                  if (typeSelect && numberSelect) {
+                      typeSelect.value = tap.type;
+                      
+                      // Populate the number options based on type
+                      if (this.allTaps[tap.type]) {
+                          numberSelect.innerHTML = '';
+                          const defaultOption = document.createElement('option');
+                          defaultOption.value = '';
+                          defaultOption.textContent = CONFIG.TRANSLATIONS.CHOOSE_TAP;
+                          numberSelect.appendChild(defaultOption);
+                          
+                          this.allTaps[tap.type].forEach(number => {
+                              const option = document.createElement('option');
+                              option.value = number;
+                              option.textContent = number;
+                              option.selected = (number === tap.number);
+                              numberSelect.appendChild(option);
+                          });
+                      }
+                      
+                      // Set the number value directly
+                      numberSelect.value = tap.number;
+                  }
+              }
+          }
 
-        await this.generateTapSelect(reservation.tapNumber);
-        form.tapNumber.value = reservation.tapNumber;
+          // Add beer entries
+          if (reservation.beers && Array.isArray(reservation.beers)) {
+              reservation.beers.forEach(beer => {
+                  this.addBeerEntry(beer.type, beer.quantity);
+              });
+          }
 
-        // Add beer entries
-        for (const beer of reservation.beers) {
-          await this.addBeerEntry(beer.type, beer.quantity);
-        }
-
-        // Set options and comments
-        form.barnumOption.checked = reservation.barnumOption;
-        form.barnum2Option.checked = reservation.barnum2Option;
-        form.photoBoothOption.checked = reservation.photoBoothOption;
-        form.comment.value = reservation.comment;
-        document.getElementById('annualReservation').checked = reservation.isAnnual === 1;
-        form.dataset.editingId = reservation.id;
+          // Set options and comments
+          form.barnumOption.checked = reservation.barnumOption;
+          form.barnum2Option.checked = reservation.barnum2Option;
+          form.photoBoothOption.checked = reservation.photoBoothOption;
+          form.comment.value = reservation.comment;
+          document.getElementById('annualReservation').checked = reservation.isAnnual === 1;
+          form.dataset.editingId = reservation.id;
       } else {
-        // Reset form for new reservation
-        modalTitle.textContent = CONFIG.TRANSLATIONS.NEW_RESERVATION;
-        form.reset();
-        form.dataset.editingId = '';
-        await this.addBeerEntry();
+          // Reset form for new reservation
+          modalTitle.textContent = CONFIG.TRANSLATIONS.NEW_RESERVATION;
+          form.reset();
+          form.dataset.editingId = '';
       }
 
       // Update equipment availability
       await this.updateEquipmentAvailability(
-        form.startDate.value,
-        form.endDate.value,
-        reservationId
+          form.startDate.value,
+          form.endDate.value,
+          reservationId
       );
 
       // Show the modal
@@ -657,42 +753,59 @@ const CONFIG = {
     async handleReservationSubmit() {
       const form = document.getElementById('reservationForm');
       if (!form) {
-        Utilities.logError('Reservation form not found!');
-        return;
+          Utilities.logError('Reservation form not found!');
+          return;
       }
+
+      // Get all tap entries from the DOM
+      const tapEntriesContainer = document.getElementById('tapEntriesContainer');
+      const tapEntryElements = tapEntriesContainer.querySelectorAll('.tap-entry');
+      
+      // Prepare to gather tap data from all tap entries
+      const taps = Array.from(tapEntryElements).map(entry => {
+          const tapTypeEl = entry.querySelector('.tapType');
+          const tapNumberEl = entry.querySelector('.tapNumber');
+          
+          if (!tapTypeEl || !tapNumberEl || !tapTypeEl.value || !tapNumberEl.value) return null;
+          
+          return {
+              type: tapTypeEl.value,
+              number: tapNumberEl.value
+          };
+      }).filter(tap => tap !== null);
 
       // Get form data
       const reservation = {
-        id: form.dataset.editingId || null,
-        clientName: form.clientName.value,
-        clientPhone: form.clientPhone.value,
-        startDate: form.startDate.value,
-        endDate: form.endDate.value,
-        tapType: form.tapType.value,
-        tapNumber: form.tapNumber.value,
-        beers: Array.from(document.querySelectorAll('.beer-entry'))
-          .map(entry => ({
-            type: entry.querySelector('.beerType').value,
-            quantity: parseInt(entry.querySelector('.beerQuantity').value, 10) || 1
-          }))
-          .filter(beer => beer.type !== ''),
-        barnumOption: form.barnumOption.checked,
-        barnum2Option: form.barnum2Option.checked,
-        photoBoothOption: form.photoBoothOption.checked,
-        comment: form.comment.value,
-        isAnnual: document.getElementById('annualReservation').checked ? 1 : 0
+          id: form.dataset.editingId || null,
+          raisonSociale: form.raisonSociale.value,
+          clientName: form.clientName.value,
+          clientPhone: form.clientPhone.value,
+          startDate: form.startDate.value,
+          endDate: form.endDate.value,
+          taps: taps, // Store the array of taps with type and number
+          beers: Array.from(document.querySelectorAll('.beer-entry'))
+            .map(entry => ({
+              type: entry.querySelector('.beerType').value,
+              quantity: parseInt(entry.querySelector('.beerQuantity').value, 10) || 1
+            }))
+            .filter(beer => beer.type !== ''),
+          barnumOption: form.barnumOption.checked,
+          barnum2Option: form.barnum2Option.checked,
+          photoBoothOption: form.photoBoothOption.checked,
+          comment: form.comment.value,
+          isAnnual: document.getElementById('annualReservation').checked ? 1 : 0
       };
 
       Utilities.log('New Reservation Data Sent', reservation);
 
       try {
-        await ApiService.saveReservation(reservation);
-        await this.updateReservationsDisplay();
+          await ApiService.saveReservation(reservation);
+          await this.updateReservationsDisplay();
 
-        // Close the modal
-        Utilities.getModalInstance('reservationModal').hide();
+          // Close the modal
+          Utilities.getModalInstance('reservationModal').hide();
       } catch (error) {
-        alert(`Error saving reservation: ${error.message}`);
+          alert(`Error saving reservation: ${error.message}`);
       }
     }
 
@@ -788,94 +901,113 @@ const CONFIG = {
       // Add status class
       const statusClass = this.getReservationStatusClass(reservation);
       if (statusClass) {
-        row.classList.add(statusClass);
+          row.classList.add(statusClass);
       }
 
       // Format equipment options
       const equipmentOptions = [
-        reservation.barnumOption ? CONFIG.TRANSLATIONS.EQUIPMENT.BARNUM_3X3 : '',
-        reservation.barnum2Option ? CONFIG.TRANSLATIONS.EQUIPMENT.BARNUM_3X6 : '',
-        reservation.photoBoothOption ? CONFIG.TRANSLATIONS.EQUIPMENT.PHOTO_BOOTH : ''
+          reservation.barnumOption ? CONFIG.TRANSLATIONS.EQUIPMENT.BARNUM_3X3 : '',
+          reservation.barnum2Option ? CONFIG.TRANSLATIONS.EQUIPMENT.BARNUM_3X6 : '',
+          reservation.photoBoothOption ? CONFIG.TRANSLATIONS.EQUIPMENT.PHOTO_BOOTH : ''
       ].filter(Boolean).join(' ');
 
       // Format beer list
       const beerList = reservation.beers
-        .map(beer => `${beer.quantity} × ${beer.type}`)
-        .join('<br>');
+          .map(beer => `${beer.quantity} × ${beer.type}`)
+          .join('<br>');
+      
+      // Format tap list
+      let tapDisplay = '-';
+      if (Array.isArray(reservation.taps) && reservation.taps.length > 0) {
+          tapDisplay = reservation.taps
+              .map(tap => `${tap.number}`)
+              .join('<br>');
+      }
 
       row.innerHTML = `
-        <td>${reservation.clientName}</td>
-        <td>${reservation.clientPhone || '-'}</td>
-        <td>${Utilities.formatDate(reservation.startDate)}</td>
-        <td>${Utilities.formatDate(reservation.endDate)}</td>
-        <td>${reservation.tapNumber}</td>
-        <td>${beerList}</td>
-        <td>${equipmentOptions || '-'}</td>
-        <td>${reservation.comment || '-'}</td>
-        <td>
-          <button class="btn btn-sm btn-primary edit-btn" data-id="${reservation.id}">Modifier</button>
-          <button class="btn btn-sm btn-danger delete-btn" data-id="${reservation.id}">Supprimer</button>
-          <button class="btn btn-sm btn-warning archive-btn" data-id="${reservation.id}">Archiver</button>
-        </td>
+          <td>${reservation.raisonSociale}</td>
+          <td>${reservation.clientName}</td>
+          <td>${reservation.clientPhone || '-'}</td>
+          <td>${Utilities.formatDate(reservation.startDate)}</td>
+          <td>${Utilities.formatDate(reservation.endDate)}</td>
+          <td>${tapDisplay}</td>
+          <td>${beerList}</td>
+          <td>${equipmentOptions || '-'}</td>
+          <td>${reservation.comment || '-'}</td>
+          <td>
+              <button class="btn btn-sm bg-blue edit-btn" data-id="${reservation.id}">Modifier</button>
+              <button class="btn btn-sm bg-orange delete-btn" data-id="${reservation.id}">Supprimer</button>
+              <button class="btn btn-sm bg-yellow archive-btn" data-id="${reservation.id}">Archiver</button>
+          </td>
       `;
 
       // Add event listeners
       row.querySelector('.edit-btn').addEventListener('click', (e) => {
-        this.openNewReservationModal(e.target.dataset.id);
+          this.openNewReservationModal(e.target.dataset.id);
       });
 
       row.querySelector('.delete-btn').addEventListener('click', (e) => {
-        this.deleteReservation(e.target.dataset.id);
+          this.deleteReservation(e.target.dataset.id);
       });
 
       row.querySelector('.archive-btn').addEventListener('click', (e) => {
-        this.archiveAndDeleteReservation(e.target.dataset.id);
+          this.archiveAndDeleteReservation(e.target.dataset.id);
       });
 
       return row;
     }
 
-/**
- * Creates a table row for an archived reservation
- * @param {Object} reservation - Archived reservation data
- * @returns {HTMLTableRowElement} Table row element
- */
-createArchivedReservationRow(reservation) {
-    const row = document.createElement('tr');
+    /**
+    * Creates a table row for an archived reservation
+    * @param {Object} reservation - Archived reservation data
+    * @returns {HTMLTableRowElement} Table row element
+    */
+    createArchivedReservationRow(reservation) {
+      const row = document.createElement('tr');
 
-    // Format equipment options
-    const equipmentOptions = [
-      reservation.barnumOption ? CONFIG.TRANSLATIONS.EQUIPMENT.BARNUM_3X3 : '',
-      reservation.barnum2Option ? CONFIG.TRANSLATIONS.EQUIPMENT.BARNUM_3X6 : '',
-      reservation.photoBoothOption ? CONFIG.TRANSLATIONS.EQUIPMENT.PHOTO_BOOTH : ''
-    ].filter(Boolean).join(' ');
+      // Format equipment options
+      const equipmentOptions = [
+          reservation.barnumOption ? CONFIG.TRANSLATIONS.EQUIPMENT.BARNUM_3X3 : '',
+          reservation.barnum2Option ? CONFIG.TRANSLATIONS.EQUIPMENT.BARNUM_3X6 : '',
+          reservation.photoBoothOption ? CONFIG.TRANSLATIONS.EQUIPMENT.PHOTO_BOOTH : ''
+      ].filter(Boolean).join(' ');
 
-    // Format beer list
-    const beerList = reservation.beers
-      .map(beer => `${beer.quantity} × ${beer.type}`)
-      .join('<br>');
+      // Format beer list
+      const beerList = reservation.beers
+          .map(beer => `${beer.quantity} × ${beer.type}`)
+          .join('<br>');
+      
+      // Format tap list
+      let tapDisplay = '-';
+      if (Array.isArray(reservation.taps) && reservation.taps.length > 0) {
+          tapDisplay = reservation.taps
+              .map(tap => `${tap.number}`)
+              .join('<br>');
+      }
 
-    row.innerHTML = `
-      <td>${reservation.clientName}</td>
-      <td>${reservation.clientPhone || '-'}</td>
-      <td>${Utilities.formatDate(reservation.startDate)}</td>
-      <td>${Utilities.formatDate(reservation.endDate)}</td>
-      <td>${reservation.tapNumber}</td>
-      <td>${beerList}</td>
-      <td>${equipmentOptions || '-'}</td>
-      <td>${reservation.comment || '-'}</td>
-      <td>
-        <button class="btn btn-sm btn-danger delete-archived-btn" data-id="${reservation.id}">Supprimer</button>
-      </td>
-    `;
+      row.innerHTML = `
+          <td>${reservation.raisonSociale}</td>
+          <td>${reservation.clientName}</td>
+          <td>${reservation.clientPhone || '-'}</td>
+          <td>${Utilities.formatDate(reservation.startDate)}</td>
+          <td>${Utilities.formatDate(reservation.endDate)}</td>
+          <td>${tapDisplay}</td>
+          <td>${beerList}</td>
+          <td>${equipmentOptions || '-'}</td>
+          <td>${reservation.comment || '-'}</td>
+          <td>
+              <button class="btn btn-sm bg-orange delete-archived-btn" data-id="${reservation.id}">Supprimer</button>
+          </td>
+      `;
 
-    // Add event listener for delete button
-    row.querySelector('.delete-archived-btn').addEventListener('click', (e) => {
-      this.deleteArchivedReservation(e.target.dataset.id);
-    });
+      // Add event listener for delete button
+      row.querySelector('.delete-archived-btn').addEventListener('click', (e) => {
+          this.deleteArchivedReservation(e.target.dataset.id);
+      });
 
-    return row;
-  }
+      return row;
+    }
+
 
   /**
    * Deletes a reservation after confirmation
@@ -931,66 +1063,94 @@ createArchivedReservationRow(reservation) {
     }
   }
 
-  /**
-   * Generates the tap select dropdown based on availability
-   * @param {string|null} currentTapNumber - Currently selected tap number
-   * @returns {Promise<void>}
-   */
-  async generateTapSelect(currentTapNumber = null) {
-    const tapType = document.getElementById('tapType').value;
-    const tapNumberSelect = document.getElementById('tapNumber');
+/**
+ * Generates the tap select dropdown based on availability
+ * @param {number} tapIndex - Index of the tap entry
+ * @returns {Promise<void>}
+ */
+async generateTapSelect(tapIndex) {
+  // Get the actual elements from the DOM instead of relying on ID
+  const tapEntriesContainer = document.getElementById('tapEntriesContainer');
+  const tapEntryElements = tapEntriesContainer.querySelectorAll('.tap-entry');
+  
+  if (tapIndex >= tapEntryElements.length) {
+      Utilities.logError(`Tap index ${tapIndex} is out of bounds`);
+      return;
+  }
+  
+  const tapEntry = tapEntryElements[tapIndex];
+  const tapTypeSelect = tapEntry.querySelector('.tapType');
+  const tapNumberSelect = tapEntry.querySelector('.tapNumber');
 
-    if (!tapType) {
+  if (!tapTypeSelect || !tapNumberSelect) {
+      Utilities.logError('Tap selectors not found');
+      return;
+  }
+
+  if (!tapTypeSelect.value) {
       tapNumberSelect.innerHTML = `<option value="" selected>${CONFIG.TRANSLATIONS.CHOOSE_TAP}</option>`;
       return;
-    }
+  }
 
-    const startDate = document.getElementById('startDate').value;
-    const endDate = document.getElementById('endDate').value;
-    const reservations = await ApiService.getReservations();
+  const startDate = document.getElementById('startDate').value;
+  const endDate = document.getElementById('endDate').value;
+  const reservations = await ApiService.getReservations();
 
-    if (!Array.isArray(reservations)) {
+  if (!Array.isArray(reservations)) {
       Utilities.logError('getReservations() did not return an array', reservations);
       return;
-    }
+  }
 
-    // Find which taps are already booked for the selected date range
-    const usedTaps = new Set(
-      reservations.filter(res =>
-        res.tapType === tapType &&
-        !(new Date(res.endDate) < new Date(startDate) || new Date(res.startDate) > new Date(endDate)) &&
-        res.id !== this.currentEditingId
-      ).map(res => res.tapNumber)
-    );
+  // Find all taps of the selected type that are already reserved
+  const usedTaps = new Set();
+  
+  reservations.forEach(res => {
+      // Skip current reservation if we're editing
+      if (res.id === this.currentEditingId) return;
+      
+      // Check date overlap
+      const resStart = new Date(res.startDate);
+      const resEnd = new Date(res.endDate);
+      const selectedStart = new Date(startDate);
+      const selectedEnd = new Date(endDate);
+      
+      const isOverlapping = !(resEnd < selectedStart || resStart > selectedEnd);
+      
+      // If dates overlap, add any taps of the selected type to usedTaps
+      if (isOverlapping && Array.isArray(res.taps)) {
+          res.taps.forEach(tap => {
+              if (tap.type === tapTypeSelect.value) {
+                  usedTaps.add(tap.number);
+              }
+          });
+      }
+  });
 
-    const availableTaps = [];
-    const reservedTaps = [];
+  const availableTaps = [];
+  const reservedTaps = [];
 
-    if (this.allTaps[tapType]) {
-      this.allTaps[tapType].forEach(tap => {
-        if (usedTaps.has(tap)) {
-          reservedTaps.push(tap);
-        } else {
-          availableTaps.push(tap);
-        }
+  if (this.allTaps[tapTypeSelect.value]) {
+      this.allTaps[tapTypeSelect.value].forEach(tap => {
+          if (usedTaps.has(tap)) {
+              reservedTaps.push(tap);
+          } else {
+              availableTaps.push(tap);
+          }
       });
-    }
+  }
 
-    tapNumberSelect.innerHTML = `
+  tapNumberSelect.innerHTML = `
       <option value="" selected>${CONFIG.TRANSLATIONS.CHOOSE_TAP}</option>
       <optgroup label="${CONFIG.TRANSLATIONS.AVAILABILITY.AVAILABLE}">
-        ${availableTaps.map(tap => `<option value="${tap}">${tap}</option>`).join('')}
+          ${availableTaps.map(tap => `<option value="${tap}">${tap}</option>`).join('')}
       </optgroup>
       <optgroup label="${CONFIG.TRANSLATIONS.AVAILABILITY.RESERVED}">
-        ${reservedTaps.map(tap => `<option value="${tap}" disabled>${tap}</option>`).join('')}
+          ${reservedTaps.map(tap => `<option value="${tap}" disabled="disabled">${tap}</option>`).join('')}
       </optgroup>
-    `;
-
-    // Set the selected tap if editing a reservation
-    if (currentTapNumber) {
-      tapNumberSelect.value = currentTapNumber;
-    }
+  `;
 }
+
+
 
 /**
    * Updates the equipment availability based on date range
@@ -1030,7 +1190,7 @@ async updateEquipmentAvailability(startDate, endDate, currentReservationId = nul
         if (reservation.barnum2Option) barnum3x6Reserved = true;
         if (reservation.photoBoothOption) photoBoothReserved = true;
     }
-    });
+  });
 
     // Disable options if already reserved
     const barnumOption = document.getElementById('barnumOption');
@@ -1054,7 +1214,55 @@ async updateEquipmentAvailability(startDate, endDate, currentReservationId = nul
       photoBoothOption.checked = false;
     }
   }
+
+  updateTapNumbers(tapIndex, tapType) {
+    const tapNumberSelect = document.getElementById(`tapNumber-${tapIndex}`);
+    const options = this.allTaps[tapType].map(tap => `<option value="${tap}">${tap}</option>`).join('');
+    tapNumberSelect.innerHTML = `<option value="">Choisir une tireuse...</option>${options}`;
   }
+/**
+ * Removes a tap entry by index
+ * @param {number} tapIndex - Index of the tap entry to remove
+ */
+  removeTapEntry(tapIndex) {
+    // Find the tap entry element
+    const tapEntryToRemove = this.tapEntries.find((_, index) => {
+        const typeSelect = document.getElementById(`tapType-${index}`);
+        return typeSelect && typeSelect.closest('.tap-entry') === this.tapEntries[tapIndex];
+    });
+
+    if (tapEntryToRemove) {
+        // Remove from DOM
+        tapEntryToRemove.remove();
+        
+        // Remove from array
+        this.tapEntries = this.tapEntries.filter(entry => entry !== tapEntryToRemove);
+        
+        // Renumber remaining entries for consistency
+        this.tapEntries.forEach((entry, newIndex) => {
+            const oldTypeSelect = entry.querySelector('.tapType');
+            const oldNumberSelect = entry.querySelector('.tapNumber');
+            const oldIndex = oldTypeSelect.id.split('-')[1];
+            
+            // Update IDs
+            oldTypeSelect.id = `tapType-${newIndex}`;
+            oldNumberSelect.id = `tapNumber-${newIndex}`;
+            
+            // Update event listeners
+            const removeBtn = entry.querySelector('.removeTap');
+            removeBtn.replaceWith(removeBtn.cloneNode(true));
+            entry.querySelector('.removeTap').addEventListener('click', () => {
+                this.removeTapEntry(newIndex);
+            });
+            
+            // Ensure tap type change listener is updated
+            oldTypeSelect.removeEventListener('change', () => this.generateTapSelect(oldIndex));
+            oldTypeSelect.addEventListener('change', () => this.generateTapSelect(newIndex));
+        });
+    }
+  }
+  }
+
 
   /**
    * Initialize the application when DOM is loaded

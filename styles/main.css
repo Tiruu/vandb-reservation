@@ -1,3 +1,18 @@
+:root {
+    --yellow: #f8bb09;
+    --light-yellow: #f7d802;
+    --orange: #e96029;
+    --light-orange: #ea6029;
+    --green: #28a745;
+    --blue-green: #2ef4c5;
+    --blue: #3a8f8c;
+    --red: #dc3545;
+    --white: #fff;
+    --black: #000;
+    --cream: #feedd8;
+    --grey: #e0e0e0;
+}
+
 /* 🌍 Scrollbar horizontale en haut */
 .table-responsive {
     position: relative;
@@ -31,69 +46,41 @@
     font-size: 14px;
     border: 1px solid #bebebe; /* Light gray Bootstrap border */
 }
-
-/* ✅ Colorer les cases avec réservations en vert */
-td.reserved {
-    background-color: #28a745; /* Vert Bootstrap */
-    color: white !important;
-    font-weight: bold;
-    cursor: pointer;
-}
-td.annual-reserved {
-    background-color: #28a745; /* Vert Bootstrap */
-    color: white !important;
-    font-weight: bold;
-    cursor: pointer;
-}
-td.archived {
-    background-color: #4d4d4d; /* Vert Bootstrap */
-    color: white !important;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-/* ✅ Améliorer l'affichage des icônes calendrier */
-td.reserved::after {
-    content: "";
-    font-size: 16px;
-}
-
-/* Ensures the today column is clearly visible */
 /* Highlight the entire column for today, but not the green boxes */
 #calendarTable th.today-column,
 #calendarTable td.today-column:not(.reserved) {
-    background-color: gold !important; /* Gold for empty cells */
+    background-color: var(--light-yellow) !important; /* Gold for empty cells */
     font-weight: bold !important;
 }
 
 /* Ensure reserved (green) cells remain unchanged */
 #calendarTable td.today-column.reserved {
-    background-color: #28a745 !important; /* Keep green */
+    background-color: var(--green) !important; /* Keep green */
     color: white !important;
 }
 #calendarTable td.today-column.annual-reserved {
-    background-color: blue !important;
+    background-color: var(--blue) !important;
     color: white !important;
 }
 #calendarTable td.today-column.archived {
-    background-color: blue !important;
+    background-color: var(--orange) !important;
     color: white !important;
 }
 
 /* 🔶 Highlight today's column */
 .today-column {
-    background-color: gold !important;
+    background-color: var(--light-yellow) !important;
 }
 
 /* 🔵 Annual reservations in blue */
 .annual-reserved {
-    background-color: blue !important;
+    background-color: var(--blue) !important;
     color: white;
 }
 
 /* ✅ Normal reservations in green */
 .reserved {
-    background-color: #28a745 !important;
+    background-color: var(--green) !important;
     color: white;
 }
 .archived{
@@ -107,26 +94,10 @@ td.reserved::after {
 }
 
 /* Style pour les accordéons de réservation */
-#regularReservationsHeader .accordion-button {
-    background-color: rgba(25, 135, 84, 0.1); /* Teinte verte légère */
-    border-left: 4px solid #198754; /* Bordure verte */
-}
-
-#annualReservationsHeader .accordion-button {
-    background-color: rgba(13, 110, 253, 0.1); /* Teinte bleue légère */
-    border-left: 4px solid #0d6efd; /* Bordure bleue */
-}
-
-#archivedReservationsHeader .accordion-button {
-    background-color: rgba(237, 253, 13, 0.1);
-    border-left: 4px solid #fbff24; /* Bordure bleue */
-}
-
-.accordion-button:not(.collapsed) {
-    box-shadow: none; /* Enlever l'ombre par défaut */
+.accordion-button {
+    background-color: var(--light-yellow) !important; /* Teinte verte légère */
     font-weight: bold;
 }
-
 
 /* Style for the tables */
 .table {
@@ -137,7 +108,6 @@ td.reserved::after {
 /* Borders for table headers and cells */
 .table th, 
 .table td {
-    border: 1px solid #ffffffa9; /* Light gray Bootstrap border */
     padding: 8px; /* Adjust padding for better readability */
     text-align: center;
     vertical-align: middle; /* Center text vertically */
@@ -152,5 +122,41 @@ td.reserved::after {
 
 /* Alternate row colors for better readability */
 .table-striped tbody tr:nth-child(odd) {
-    background-color: #f9f9f9;
+    background-color: var(--grey);
+}
+
+.bg-yellow {
+    background-color: var(--yellow) !important;
+}
+
+.bg-light-yellow {
+    background-color: var(--light-yellow) !important;
+}
+
+.bg-grey {
+    background-color: var(--grey) !important;
+}
+
+.bg-green {
+    background-color: var(--green) !important;
+}
+
+.bg-blue-green {
+    background-color: var(--blue-green) !important;
+}
+
+.bg-blue {
+    background-color: var(--blue) !important;
+}
+
+.bg-orange {
+    background-color: var(--orange) !important;
+}
+
+.bg-light-orange {
+    background-color: var(--light-orange) !important;
+}
+
+.bg-white {
+    background-color: var(--white) !important;
 }

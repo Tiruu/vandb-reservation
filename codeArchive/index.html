@@ -51,7 +51,8 @@
                             <table class="table table-striped mb-0">
                                 <thead>
                                     <tr>
-                                        <th>Client</th>
+                                        <th>Raison sociale</th>
+                                        <th>Nom / prénom</th>
                                         <th>Téléphone</th>
                                         <th>Début</th>
                                         <th>Fin</th>
@@ -84,6 +85,7 @@
                             <table class="table table-striped mb-0">
                                 <thead>
                                     <tr>
+                                        <th>Raison sociale</th>
                                         <th>Client</th>
                                         <th>Téléphone</th>
                                         <th>Début</th>
@@ -117,6 +119,7 @@
                             <table class="table table-striped mb-0">
                                 <thead>
                                     <tr>
+                                        <th>Raison sociale</th>
                                         <th>Client</th>
                                         <th>Téléphone</th>
                                         <th>Début</th>
@@ -151,11 +154,17 @@
                 <div class="modal-body">
                     <form id="reservationForm">
                         <div class="row">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="annualReservation">
-                                <label class="form-check-label" for="annualReservation">Réservation Annuelle</label>
-                            </div>
                             <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="annualReservation">
+                                    <label class="form-check-label" for="annualReservation">Réservation Annuelle</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label>Raison sociale</label>
+                                <input type="text" id="raisonSociale" class="form-control" required>
                                 <label>Nom du Client</label>
                                 <input type="text" id="clientName" class="form-control" required>
                                 <label>Téléphone</label>
@@ -168,25 +177,14 @@
                                 <input type="date" id="endDate" class="form-control" required>
                             </div>
                         </div>
+                        <hr>
                         <div class="row mt-3">
-                            <div class="col-md-6">
+                            <div class="col-12">
                                 <label>Type de Tireuse</label>
-                                <select id="tapType" class="form-select">
-                                    <option value="">Choisir un type de tireuse...</option>
-                                    <option value="FS">Froid Sec</option>
-                                    <option value="T1">Trappiste 1</option>
-                                    <option value="T2">Trappiste 2</option>
-                                    <option value="Tonneau">Tonneau</option>
-                                    <option value="Bertha">Bertha</option>
-                                    <option value="Festoche">Festoche</option>
-                                    <option value="Picolo">Picolo</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label>Numéro de Tireuse</label>
-                                <select id="tapNumber" class="form-select">
-                                    <option value="" selected>Choisir une tireuse...</option>
-                                </select>
+                                <div id="tapEntriesContainer">
+
+                                </div>
+                                <button type="button" class="btn btn-secondary mt-2" id="addTapBtn">+ Ajouter une tireuse</button>
                             </div>
                         </div>
                         <div class="row mt-3">
@@ -198,6 +196,7 @@
                                 <button type="button" class="btn btn-secondary mt-2" id="addBeer">+ Ajouter un type de fût</button>
                             </div>
                         </div>
+                        <hr>
                         <div class="row mt-3">
                             <div class="col-md-12">
                                 <label>Commentaire</label>
