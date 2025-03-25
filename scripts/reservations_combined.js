@@ -449,17 +449,17 @@ const CONFIG = {
       styleElement.textContent = `
         /* Target Bootstrap's custom property mechanism */
         tr.${CONFIG.RESERVATION_STATUS.ACTIVE} {
-          --bs-table-accent-bg: rgba(25, 135, 84, 0.15) !important;
-          --bs-table-bg-type: rgba(25, 135, 84, 0.15) !important;
-          --bs-table-bg-state: rgba(25, 135, 84, 0.15) !important;
-          --bs-table-bg: rgba(25, 135, 84, 0.15) !important;
+          --bs-table-accent-bg: rgba(58, 143, 140, 0.15) !important;
+          --bs-table-bg-type: rgba(58, 143, 140, 0.15) !important;
+          --bs-table-bg-state: rgba(58, 143, 140, 0.15) !important;
+          --bs-table-bg: rgba(58, 143, 140, 0.15) !important;
         }
 
         tr.${CONFIG.RESERVATION_STATUS.EXPIRED} {
-          --bs-table-accent-bg: rgba(220, 53, 69, 0.15) !important;
-          --bs-table-bg-type: rgba(220, 53, 69, 0.15) !important;
-          --bs-table-bg-state: rgba(220, 53, 69, 0.15) !important;
-          --bs-table-bg: rgba(220, 53, 69, 0.15) !important;
+          --bs-table-accent-bg: rgba(233, 96, 41, 0.15) !important;
+          --bs-table-bg-type: rgba(233, 96, 41, 0.15) !important;
+          --bs-table-bg-state: rgba(233, 96, 41, 0.15) !important;
+          --bs-table-bg: rgba(233, 96, 41, 0.15) !important;
         }
 
         /* Override the box-shadow approach for maximum compatibility */
@@ -470,11 +470,11 @@ const CONFIG = {
 
         /* Apply direct background-color as a fallback */
         tr.${CONFIG.RESERVATION_STATUS.ACTIVE} > * {
-          background-color: rgba(25, 135, 84, 0.15) !important;
+          background-color: rgba(58, 143, 140, 0.15) !important;
         }
 
         tr.${CONFIG.RESERVATION_STATUS.EXPIRED} > * {
-          background-color: rgba(220, 53, 69, 0.15) !important;
+          background-color: rgba(233, 96, 41, 0.15 0.15) !important;
         }
       `;
       document.head.appendChild(styleElement);
@@ -579,239 +579,235 @@ const CONFIG = {
       });
     }
 
-/**
- * Adds a new tap entry directly beneath the last one
- * @returns {HTMLElement} The created tap entry container
- */
-addTapEntry() {
-  // Generating a unique index for each tap entry for better control
-  const tapIndex = this.tapEntries.length;
+    /**
+     * Adds a new tap entry directly beneath the last one
+     * @returns {HTMLElement} The created tap entry container
+     */
+    addTapEntry() {
+      // Generating a unique index for each tap entry for better control
+      const tapIndex = this.tapEntries.length;
 
-  // Creating the container for a new tap entry
-  const tapContainer = document.createElement('div');
-  tapContainer.className = 'tap-entry row mt-3';
-  tapContainer.innerHTML = `
-      <div class="col-md-5">
-          <select class="form-select tapType" id="tapType-${tapIndex}">
-              <option value="">Choisir un type de tireuse...</option>
-              ${Object.keys(this.allTaps).map(type => `<option value="${type}">${type}</option>`).join('')}
-          </select>
-      </div>
-      <div class="col-md-4">
-          <select class="form-select tapNumber" id="tapNumber-${tapIndex}">
-              <option value="">Choisir une tireuse...</option>
-          </select>
-      </div>
-      <div class="col-md-3 d-flex align-items-center">
-          <button type="button" class="btn btn-danger removeTap">Supprimer</button>
-      </div>
-  `;
+      // Creating the container for a new tap entry
+      const tapContainer = document.createElement('div');
+      tapContainer.className = 'tap-entry row mt-3';
+      tapContainer.innerHTML = `
+          <div class="col-md-5">
+              <select class="form-select tapType" id="tapType-${tapIndex}">
+                  <option value="">Choisir un type de tireuse...</option>
+                  ${Object.keys(this.allTaps).map(type => `<option value="${type}">${type}</option>`).join('')}
+              </select>
+          </div>
+          <div class="col-md-4">
+              <select class="form-select tapNumber" id="tapNumber-${tapIndex}">
+                  <option value="">Choisir une tireuse...</option>
+              </select>
+          </div>
+          <div class="col-md-3 d-flex align-items-center">
+              <button type="button" class="btn btn-danger removeTap">Supprimer</button>
+          </div>
+      `;
 
-  // Get the container for tap entries
-  const tapEntriesContainer = document.getElementById('tapEntriesContainer');
-  tapEntriesContainer.appendChild(tapContainer);
+      // Get the container for tap entries
+      const tapEntriesContainer = document.getElementById('tapEntriesContainer');
+      tapEntriesContainer.appendChild(tapContainer);
 
-  // Add event listener for tap removal
-  const removeButton = tapContainer.querySelector('.removeTap');
-  removeButton.addEventListener('click', () => {
-      this.removeTapEntry(tapIndex);
-  });
+      // Add event listener for tap removal
+      const removeButton = tapContainer.querySelector('.removeTap');
+      removeButton.addEventListener('click', () => {
+          this.removeTapEntry(tapIndex);
+      });
 
-  // Add event listener for tap type selection
-  const tapTypeSelect = tapContainer.querySelector('.tapType');
-  tapTypeSelect.addEventListener('change', () => {
-      const currentIndex = Array.from(tapEntriesContainer.children).indexOf(tapContainer);
-      this.generateTapSelect(currentIndex);
-  });
+      // Add event listener for tap type selection
+      const tapTypeSelect = tapContainer.querySelector('.tapType');
+      tapTypeSelect.addEventListener('change', () => {
+          const currentIndex = Array.from(tapEntriesContainer.children).indexOf(tapContainer);
+          this.generateTapSelect(currentIndex);
+      });
 
-  // Save this entry in the array for management
-  this.tapEntries.push(tapContainer);
+      // Save this entry in the array for management
+      this.tapEntries.push(tapContainer);
 
-  return tapContainer;
-}
-/**
- * Opens the reservation modal for creating or editing
- * @param {string|null} reservationId - ID of reservation to edit
- * @returns {Promise<void>}
- */
-async openNewReservationModal(reservationId = null) {
-  Utilities.log('Opening modal for reservation ID', reservationId);
+      return tapContainer;
+    }
+    /**
+     * Opens the reservation modal for creating or editing
+     * @param {string|null} reservationId - ID of reservation to edit
+     * @returns {Promise<void>}
+     */
+    async openNewReservationModal(reservationId = null) {
+      Utilities.log('Opening modal for reservation ID', reservationId);
 
-  const modalTitle = document.getElementById('modalTitle');
-  const form = document.getElementById('reservationForm');
-  const beerContainer = document.getElementById('beerContainer');
-  const tapEntriesContainer = document.getElementById('tapEntriesContainer');
+      const modalTitle = document.getElementById('modalTitle');
+      const form = document.getElementById('reservationForm');
+      const beerContainer = document.getElementById('beerContainer');
+      const tapEntriesContainer = document.getElementById('tapEntriesContainer');
 
-  // Clear previous entries
-  beerContainer.innerHTML = '';
-  tapEntriesContainer.innerHTML = '';
-  this.tapEntries = []; // Reset tap entries array
-  this.currentEditingId = reservationId;
+      // Clear previous entries
+      beerContainer.innerHTML = '';
+      tapEntriesContainer.innerHTML = '';
+      this.tapEntries = []; // Reset tap entries array
+      this.currentEditingId = reservationId;
 
-  const reservations = await ApiService.getReservations();
-  Utilities.log('Reservations in modal', reservations);
+      const reservations = await ApiService.getReservations();
+      Utilities.log('Reservations in modal', reservations);
 
-  if (!Array.isArray(reservations)) {
-      Utilities.logError('getReservations() did not return an array', reservations);
-      return;
-  }
-
-  if (reservationId) {
-      const reservation = reservations.find(r => r.id === reservationId);
-      if (!reservation) {
-          Utilities.logError('Reservation not found');
+      if (!Array.isArray(reservations)) {
+          Utilities.logError('getReservations() did not return an array', reservations);
           return;
       }
 
-      // Populate form with reservation data
-      modalTitle.textContent = CONFIG.TRANSLATIONS.EDIT_RESERVATION;
-      form.raisonSociale.value = reservation.raisonSociale;
-      form.clientName.value = reservation.clientName;
-      form.clientPhone.value = reservation.clientPhone;
-      form.startDate.value = reservation.startDate;
-      form.endDate.value = reservation.endDate;
+      if (reservationId) {
+          const reservation = reservations.find(r => r.id === reservationId);
+          if (!reservation) {
+              Utilities.logError('Reservation not found');
+              return;
+          }
 
-      // Populate taps safely
-      if (reservation.taps && Array.isArray(reservation.taps) && reservation.taps.length > 0) {
-          // Clear the container first to avoid duplicates
-          tapEntriesContainer.innerHTML = '';
-          this.tapEntries = [];
-          
-          // Add each tap entry from the reservation
-          for (let i = 0; i < reservation.taps.length; i++) {
-              const tap = reservation.taps[i];
-              this.addTapEntry(); // This adds to this.tapEntries array
+          // Populate form with reservation data
+          modalTitle.textContent = CONFIG.TRANSLATIONS.EDIT_RESERVATION;
+          form.raisonSociale.value = reservation.raisonSociale;
+          form.clientName.value = reservation.clientName;
+          form.clientPhone.value = reservation.clientPhone;
+          form.startDate.value = reservation.startDate;
+          form.endDate.value = reservation.endDate;
+
+          // Populate taps safely
+          if (reservation.taps && Array.isArray(reservation.taps) && reservation.taps.length > 0) {
+              // Clear the container first to avoid duplicates
+              tapEntriesContainer.innerHTML = '';
+              this.tapEntries = [];
               
-              // Get the newly added entry (the last one in the array)
-              const entry = this.tapEntries[this.tapEntries.length - 1];
-              const typeSelect = entry.querySelector('.tapType');
-              const numberSelect = entry.querySelector('.tapNumber');
-              
-              if (typeSelect && numberSelect) {
-                  typeSelect.value = tap.type;
+              // Add each tap entry from the reservation
+              for (let i = 0; i < reservation.taps.length; i++) {
+                  const tap = reservation.taps[i];
+                  this.addTapEntry(); // This adds to this.tapEntries array
                   
-                  // Populate the number options based on type
-                  if (this.allTaps[tap.type]) {
-                      numberSelect.innerHTML = '';
-                      const defaultOption = document.createElement('option');
-                      defaultOption.value = '';
-                      defaultOption.textContent = CONFIG.TRANSLATIONS.CHOOSE_TAP;
-                      numberSelect.appendChild(defaultOption);
+                  // Get the newly added entry (the last one in the array)
+                  const entry = this.tapEntries[this.tapEntries.length - 1];
+                  const typeSelect = entry.querySelector('.tapType');
+                  const numberSelect = entry.querySelector('.tapNumber');
+                  
+                  if (typeSelect && numberSelect) {
+                      typeSelect.value = tap.type;
                       
-                      this.allTaps[tap.type].forEach(number => {
-                          const option = document.createElement('option');
-                          option.value = number;
-                          option.textContent = number;
-                          option.selected = (number === tap.number);
-                          numberSelect.appendChild(option);
-                      });
+                      // Populate the number options based on type
+                      if (this.allTaps[tap.type]) {
+                          numberSelect.innerHTML = '';
+                          const defaultOption = document.createElement('option');
+                          defaultOption.value = '';
+                          defaultOption.textContent = CONFIG.TRANSLATIONS.CHOOSE_TAP;
+                          numberSelect.appendChild(defaultOption);
+                          
+                          this.allTaps[tap.type].forEach(number => {
+                              const option = document.createElement('option');
+                              option.value = number;
+                              option.textContent = number;
+                              option.selected = (number === tap.number);
+                              numberSelect.appendChild(option);
+                          });
+                      }
+                      
+                      // Set the number value directly
+                      numberSelect.value = tap.number;
                   }
-                  
-                  // Set the number value directly
-                  numberSelect.value = tap.number;
               }
           }
+
+          // Add beer entries
+          if (reservation.beers && Array.isArray(reservation.beers)) {
+              reservation.beers.forEach(beer => {
+                  this.addBeerEntry(beer.type, beer.quantity);
+              });
+          }
+
+          // Set options and comments
+          form.barnumOption.checked = reservation.barnumOption;
+          form.barnum2Option.checked = reservation.barnum2Option;
+          form.photoBoothOption.checked = reservation.photoBoothOption;
+          form.comment.value = reservation.comment;
+          document.getElementById('annualReservation').checked = reservation.isAnnual === 1;
+          form.dataset.editingId = reservation.id;
       } else {
-          // Add a default empty tap entry if no taps data
-          this.addTapEntry();
+          // Reset form for new reservation
+          modalTitle.textContent = CONFIG.TRANSLATIONS.NEW_RESERVATION;
+          form.reset();
+          form.dataset.editingId = '';
       }
 
-      // Add beer entries
-      if (reservation.beers && Array.isArray(reservation.beers)) {
-          reservation.beers.forEach(beer => {
-              this.addBeerEntry(beer.type, beer.quantity);
-          });
+      // Update equipment availability
+      await this.updateEquipmentAvailability(
+          form.startDate.value,
+          form.endDate.value,
+          reservationId
+      );
+
+      // Show the modal
+      const modal = Utilities.getModalInstance('reservationModal');
+      modal.show();
+    }
+
+    /**
+     * Handles form submission for creating or updating a reservation
+     * @returns {Promise<void>}
+     */
+    async handleReservationSubmit() {
+      const form = document.getElementById('reservationForm');
+      if (!form) {
+          Utilities.logError('Reservation form not found!');
+          return;
       }
 
-      // Set options and comments
-      form.barnumOption.checked = reservation.barnumOption;
-      form.barnum2Option.checked = reservation.barnum2Option;
-      form.photoBoothOption.checked = reservation.photoBoothOption;
-      form.comment.value = reservation.comment;
-      document.getElementById('annualReservation').checked = reservation.isAnnual === 1;
-      form.dataset.editingId = reservation.id;
-  } else {
-      // Reset form for new reservation
-      modalTitle.textContent = CONFIG.TRANSLATIONS.NEW_RESERVATION;
-      form.reset();
-      form.dataset.editingId = '';
-      this.addTapEntry(); // Add a default empty tap entry
-  }
-
-  // Update equipment availability
-  await this.updateEquipmentAvailability(
-      form.startDate.value,
-      form.endDate.value,
-      reservationId
-  );
-
-  // Show the modal
-  const modal = Utilities.getModalInstance('reservationModal');
-  modal.show();
-}
-
-/**
- * Handles form submission for creating or updating a reservation
- * @returns {Promise<void>}
- */
-async handleReservationSubmit() {
-  const form = document.getElementById('reservationForm');
-  if (!form) {
-      Utilities.logError('Reservation form not found!');
-      return;
-  }
-
-  // Get all tap entries from the DOM
-  const tapEntriesContainer = document.getElementById('tapEntriesContainer');
-  const tapEntryElements = tapEntriesContainer.querySelectorAll('.tap-entry');
-  
-  // Prepare to gather tap data from all tap entries
-  const taps = Array.from(tapEntryElements).map(entry => {
-      const tapTypeEl = entry.querySelector('.tapType');
-      const tapNumberEl = entry.querySelector('.tapNumber');
+      // Get all tap entries from the DOM
+      const tapEntriesContainer = document.getElementById('tapEntriesContainer');
+      const tapEntryElements = tapEntriesContainer.querySelectorAll('.tap-entry');
       
-      if (!tapTypeEl || !tapNumberEl || !tapTypeEl.value || !tapNumberEl.value) return null;
-      
-      return {
-          type: tapTypeEl.value,
-          number: tapNumberEl.value
+      // Prepare to gather tap data from all tap entries
+      const taps = Array.from(tapEntryElements).map(entry => {
+          const tapTypeEl = entry.querySelector('.tapType');
+          const tapNumberEl = entry.querySelector('.tapNumber');
+          
+          if (!tapTypeEl || !tapNumberEl || !tapTypeEl.value || !tapNumberEl.value) return null;
+          
+          return {
+              type: tapTypeEl.value,
+              number: tapNumberEl.value
+          };
+      }).filter(tap => tap !== null);
+
+      // Get form data
+      const reservation = {
+          id: form.dataset.editingId || null,
+          raisonSociale: form.raisonSociale.value,
+          clientName: form.clientName.value,
+          clientPhone: form.clientPhone.value,
+          startDate: form.startDate.value,
+          endDate: form.endDate.value,
+          taps: taps, // Store the array of taps with type and number
+          beers: Array.from(document.querySelectorAll('.beer-entry'))
+            .map(entry => ({
+              type: entry.querySelector('.beerType').value,
+              quantity: parseInt(entry.querySelector('.beerQuantity').value, 10) || 1
+            }))
+            .filter(beer => beer.type !== ''),
+          barnumOption: form.barnumOption.checked,
+          barnum2Option: form.barnum2Option.checked,
+          photoBoothOption: form.photoBoothOption.checked,
+          comment: form.comment.value,
+          isAnnual: document.getElementById('annualReservation').checked ? 1 : 0
       };
-  }).filter(tap => tap !== null);
 
-  // Get form data
-  const reservation = {
-      id: form.dataset.editingId || null,
-      raisonSociale: form.raisonSociale.value,
-      clientName: form.clientName.value,
-      clientPhone: form.clientPhone.value,
-      startDate: form.startDate.value,
-      endDate: form.endDate.value,
-      taps: taps, // Store the array of taps with type and number
-      beers: Array.from(document.querySelectorAll('.beer-entry'))
-        .map(entry => ({
-          type: entry.querySelector('.beerType').value,
-          quantity: parseInt(entry.querySelector('.beerQuantity').value, 10) || 1
-        }))
-        .filter(beer => beer.type !== ''),
-      barnumOption: form.barnumOption.checked,
-      barnum2Option: form.barnum2Option.checked,
-      photoBoothOption: form.photoBoothOption.checked,
-      comment: form.comment.value,
-      isAnnual: document.getElementById('annualReservation').checked ? 1 : 0
-  };
+      Utilities.log('New Reservation Data Sent', reservation);
 
-  Utilities.log('New Reservation Data Sent', reservation);
+      try {
+          await ApiService.saveReservation(reservation);
+          await this.updateReservationsDisplay();
 
-  try {
-      await ApiService.saveReservation(reservation);
-      await this.updateReservationsDisplay();
-
-      // Close the modal
-      Utilities.getModalInstance('reservationModal').hide();
-  } catch (error) {
-      alert(`Error saving reservation: ${error.message}`);
-  }
-}
+          // Close the modal
+          Utilities.getModalInstance('reservationModal').hide();
+      } catch (error) {
+          alert(`Error saving reservation: ${error.message}`);
+      }
+    }
 
     /**
      * Loads and displays all reservations
@@ -894,123 +890,123 @@ async handleReservationSubmit() {
         archivedReservations.length;
     }
 
-/**
- * Creates a table row for a reservation
- * @param {Object} reservation - Reservation data
- * @returns {HTMLTableRowElement} Table row element
- */
-createReservationRow(reservation) {
-  const row = document.createElement('tr');
+    /**
+     * Creates a table row for a reservation
+     * @param {Object} reservation - Reservation data
+     * @returns {HTMLTableRowElement} Table row element
+     */
+    createReservationRow(reservation) {
+      const row = document.createElement('tr');
 
-  // Add status class
-  const statusClass = this.getReservationStatusClass(reservation);
-  if (statusClass) {
-      row.classList.add(statusClass);
-  }
+      // Add status class
+      const statusClass = this.getReservationStatusClass(reservation);
+      if (statusClass) {
+          row.classList.add(statusClass);
+      }
 
-  // Format equipment options
-  const equipmentOptions = [
-      reservation.barnumOption ? CONFIG.TRANSLATIONS.EQUIPMENT.BARNUM_3X3 : '',
-      reservation.barnum2Option ? CONFIG.TRANSLATIONS.EQUIPMENT.BARNUM_3X6 : '',
-      reservation.photoBoothOption ? CONFIG.TRANSLATIONS.EQUIPMENT.PHOTO_BOOTH : ''
-  ].filter(Boolean).join(' ');
+      // Format equipment options
+      const equipmentOptions = [
+          reservation.barnumOption ? CONFIG.TRANSLATIONS.EQUIPMENT.BARNUM_3X3 : '',
+          reservation.barnum2Option ? CONFIG.TRANSLATIONS.EQUIPMENT.BARNUM_3X6 : '',
+          reservation.photoBoothOption ? CONFIG.TRANSLATIONS.EQUIPMENT.PHOTO_BOOTH : ''
+      ].filter(Boolean).join(' ');
 
-  // Format beer list
-  const beerList = reservation.beers
-      .map(beer => `${beer.quantity} × ${beer.type}`)
-      .join('<br>');
-  
-  // Format tap list
-  let tapDisplay = '-';
-  if (Array.isArray(reservation.taps) && reservation.taps.length > 0) {
-      tapDisplay = reservation.taps
-          .map(tap => `${tap.number}`)
+      // Format beer list
+      const beerList = reservation.beers
+          .map(beer => `${beer.quantity} × ${beer.type}`)
           .join('<br>');
-  }
+      
+      // Format tap list
+      let tapDisplay = '-';
+      if (Array.isArray(reservation.taps) && reservation.taps.length > 0) {
+          tapDisplay = reservation.taps
+              .map(tap => `${tap.number}`)
+              .join('<br>');
+      }
 
-  row.innerHTML = `
-      <td>${reservation.raisonSociale}</td>
-      <td>${reservation.clientName}</td>
-      <td>${reservation.clientPhone || '-'}</td>
-      <td>${Utilities.formatDate(reservation.startDate)}</td>
-      <td>${Utilities.formatDate(reservation.endDate)}</td>
-      <td>${tapDisplay}</td>
-      <td>${beerList}</td>
-      <td>${equipmentOptions || '-'}</td>
-      <td>${reservation.comment || '-'}</td>
-      <td>
-          <button class="btn btn-sm btn-primary edit-btn" data-id="${reservation.id}">Modifier</button>
-          <button class="btn btn-sm btn-danger delete-btn" data-id="${reservation.id}">Supprimer</button>
-          <button class="btn btn-sm btn-warning archive-btn" data-id="${reservation.id}">Archiver</button>
-      </td>
-  `;
+      row.innerHTML = `
+          <td>${reservation.raisonSociale}</td>
+          <td>${reservation.clientName}</td>
+          <td>${reservation.clientPhone || '-'}</td>
+          <td>${Utilities.formatDate(reservation.startDate)}</td>
+          <td>${Utilities.formatDate(reservation.endDate)}</td>
+          <td>${tapDisplay}</td>
+          <td>${beerList}</td>
+          <td>${equipmentOptions || '-'}</td>
+          <td>${reservation.comment || '-'}</td>
+          <td>
+              <button class="btn btn-sm bg-blue edit-btn" data-id="${reservation.id}">Modifier</button>
+              <button class="btn btn-sm bg-orange delete-btn" data-id="${reservation.id}">Supprimer</button>
+              <button class="btn btn-sm bg-yellow archive-btn" data-id="${reservation.id}">Archiver</button>
+          </td>
+      `;
 
-  // Add event listeners
-  row.querySelector('.edit-btn').addEventListener('click', (e) => {
-      this.openNewReservationModal(e.target.dataset.id);
-  });
+      // Add event listeners
+      row.querySelector('.edit-btn').addEventListener('click', (e) => {
+          this.openNewReservationModal(e.target.dataset.id);
+      });
 
-  row.querySelector('.delete-btn').addEventListener('click', (e) => {
-      this.deleteReservation(e.target.dataset.id);
-  });
+      row.querySelector('.delete-btn').addEventListener('click', (e) => {
+          this.deleteReservation(e.target.dataset.id);
+      });
 
-  row.querySelector('.archive-btn').addEventListener('click', (e) => {
-      this.archiveAndDeleteReservation(e.target.dataset.id);
-  });
+      row.querySelector('.archive-btn').addEventListener('click', (e) => {
+          this.archiveAndDeleteReservation(e.target.dataset.id);
+      });
 
-  return row;
-}
+      return row;
+    }
 
-/**
-* Creates a table row for an archived reservation
-* @param {Object} reservation - Archived reservation data
-* @returns {HTMLTableRowElement} Table row element
-*/
-createArchivedReservationRow(reservation) {
-  const row = document.createElement('tr');
+    /**
+    * Creates a table row for an archived reservation
+    * @param {Object} reservation - Archived reservation data
+    * @returns {HTMLTableRowElement} Table row element
+    */
+    createArchivedReservationRow(reservation) {
+      const row = document.createElement('tr');
 
-  // Format equipment options
-  const equipmentOptions = [
-      reservation.barnumOption ? CONFIG.TRANSLATIONS.EQUIPMENT.BARNUM_3X3 : '',
-      reservation.barnum2Option ? CONFIG.TRANSLATIONS.EQUIPMENT.BARNUM_3X6 : '',
-      reservation.photoBoothOption ? CONFIG.TRANSLATIONS.EQUIPMENT.PHOTO_BOOTH : ''
-  ].filter(Boolean).join(' ');
+      // Format equipment options
+      const equipmentOptions = [
+          reservation.barnumOption ? CONFIG.TRANSLATIONS.EQUIPMENT.BARNUM_3X3 : '',
+          reservation.barnum2Option ? CONFIG.TRANSLATIONS.EQUIPMENT.BARNUM_3X6 : '',
+          reservation.photoBoothOption ? CONFIG.TRANSLATIONS.EQUIPMENT.PHOTO_BOOTH : ''
+      ].filter(Boolean).join(' ');
 
-  // Format beer list
-  const beerList = reservation.beers
-      .map(beer => `${beer.quantity} × ${beer.type}`)
-      .join('<br>');
-  
-  // Format tap list
-  let tapDisplay = '-';
-  if (Array.isArray(reservation.taps) && reservation.taps.length > 0) {
-      tapDisplay = reservation.taps
-          .map(tap => `${tap.number}`)
+      // Format beer list
+      const beerList = reservation.beers
+          .map(beer => `${beer.quantity} × ${beer.type}`)
           .join('<br>');
-  }
+      
+      // Format tap list
+      let tapDisplay = '-';
+      if (Array.isArray(reservation.taps) && reservation.taps.length > 0) {
+          tapDisplay = reservation.taps
+              .map(tap => `${tap.number}`)
+              .join('<br>');
+      }
 
-  row.innerHTML = `
-      <td>${reservation.raisonSociale}</td>
-      <td>${reservation.clientName}</td>
-      <td>${reservation.clientPhone || '-'}</td>
-      <td>${Utilities.formatDate(reservation.startDate)}</td>
-      <td>${Utilities.formatDate(reservation.endDate)}</td>
-      <td>${tapDisplay}</td>
-      <td>${beerList}</td>
-      <td>${equipmentOptions || '-'}</td>
-      <td>${reservation.comment || '-'}</td>
-      <td>
-          <button class="btn btn-sm btn-danger delete-archived-btn" data-id="${reservation.id}">Supprimer</button>
-      </td>
-  `;
+      row.innerHTML = `
+          <td>${reservation.raisonSociale}</td>
+          <td>${reservation.clientName}</td>
+          <td>${reservation.clientPhone || '-'}</td>
+          <td>${Utilities.formatDate(reservation.startDate)}</td>
+          <td>${Utilities.formatDate(reservation.endDate)}</td>
+          <td>${tapDisplay}</td>
+          <td>${beerList}</td>
+          <td>${equipmentOptions || '-'}</td>
+          <td>${reservation.comment || '-'}</td>
+          <td>
+              <button class="btn btn-sm bg-orange delete-archived-btn" data-id="${reservation.id}">Supprimer</button>
+          </td>
+      `;
 
-  // Add event listener for delete button
-  row.querySelector('.delete-archived-btn').addEventListener('click', (e) => {
-      this.deleteArchivedReservation(e.target.dataset.id);
-  });
+      // Add event listener for delete button
+      row.querySelector('.delete-archived-btn').addEventListener('click', (e) => {
+          this.deleteArchivedReservation(e.target.dataset.id);
+      });
 
-  return row;
-}
+      return row;
+    }
 
 
   /**

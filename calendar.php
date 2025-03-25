@@ -8,27 +8,7 @@
     <link rel="stylesheet" href="styles/main.css">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-            <img src="medias/logo-vandb-noir-plein.png" alt="" style="width: 5rem;">
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" aria-current="page" href="index.html">Réservations</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="calendar.html">Calendrier</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="inventory.html">Stocks</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+    <?php include 'nav.php'; ?>
 
     <div class="container mt-4">
         <div class="d-flex justify-content-between align-items-center mb-3">

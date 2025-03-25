@@ -10,31 +10,11 @@
     <link rel="icon" type="image/png" href="medias/logo-vandb-noir-plein.png" />
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-            <img src="medias/logo-vandb-noir-plein.png" alt="" style="width: 5rem;">
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="index.html">Réservations</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="calendar.html">Calendrier</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="inventory.html">Stocks</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+    <?php include('nav.php'); ?>
 
     <div class="container-fluid mt-4">
         <h2 class="mb-4">Gestion des Réservations</h2>
-        <button class="btn btn-success mb-3" id="addReservationBtn">+ Ajouter une Réservation</button>
+        <button class="btn bg-blue-green mb-3" id="addReservationBtn">+ Ajouter une Réservation</button>
 
         <!-- Accordéon pour les réservations -->
         <div class="accordion" id="reservationsAccordion">
@@ -42,7 +22,7 @@
             <div class="accordion-item">
                 <h2 class="accordion-header" id="annualReservationsHeader">
                     <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#annualReservationsCollapse" aria-expanded="true" aria-controls="annualReservationsCollapse">
-                        Réservations Annuelles <span class="badge bg-primary ms-2">0</span>
+                        Réservations Annuelles <span class="badge bg-light-orange ms-2">0</span>
                     </button>
                 </h2>
                 <div id="annualReservationsCollapse" class="accordion-collapse collapse show" aria-labelledby="annualReservationsHeader">
@@ -76,7 +56,7 @@
             <div class="accordion-item">
                 <h2 class="accordion-header" id="regularReservationsHeader">
                     <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#regularReservationsCollapse" aria-expanded="true" aria-controls="regularReservationsCollapse">
-                        Réservations Classiques <span class="badge bg-success ms-2">0</span>
+                        Réservations Classiques <span class="badge bg-light-orange ms-2">0</span>
                     </button>
                 </h2>
                 <div id="regularReservationsCollapse" class="accordion-collapse collapse show" aria-labelledby="regularReservationsHeader">
@@ -110,7 +90,7 @@
             <div class="accordion-item">
                 <h2 class="accordion-header" id="archivedReservationsHeader">
                     <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#archivedReservationsCollapse" aria-expanded="true" aria-controls="archivedReservationsCollapse">
-                        Archives <span class="badge bg-warning ms-2">0</span>
+                        Archives <span class="badge bg-light-orange ms-2">0</span>
                     </button>
                 </h2>
                 <div id="archivedReservationsCollapse" class="accordion-collapse collapse show" aria-labelledby="archivedReservationsHeader">
@@ -182,9 +162,9 @@
                             <div class="col-12">
                                 <label>Type de Tireuse</label>
                                 <div id="tapEntriesContainer">
-
+                                    <!-- Les entrées de tireuses seront générées dynamiquement -->
                                 </div>
-                                <button type="button" class="btn btn-secondary mt-2" id="addTapBtn">+ Ajouter une tireuse</button>
+                                <button type="button" class="btn bg-grey mt-2" id="addTapBtn">+ Ajouter une tireuse</button>
                             </div>
                         </div>
                         <div class="row mt-3">
@@ -193,7 +173,7 @@
                                 <div id="beerContainer">
                                     <!-- Les entrées de bière seront générées dynamiquement -->
                                 </div>
-                                <button type="button" class="btn btn-secondary mt-2" id="addBeer">+ Ajouter un type de fût</button>
+                                <button type="button" class="btn bg-grey mt-2" id="addBeer">+ Ajouter un type de fût</button>
                             </div>
                         </div>
                         <hr>
@@ -220,8 +200,8 @@
                             </div>
                             <!-- ✅ Colonne droite : Empiler les boutons verticalement en bas à droite -->
                             <div class="col-md-6 d-flex flex-column align-items-end">
-                                <button type="button" class="btn btn-secondary mb-2" data-bs-dismiss="modal">Annuler</button>
-                                <button type="button" class="btn btn-primary" id="saveReservation">Enregistrer</button>
+                                <button type="button" class="btn bg-orange mb-2" data-bs-dismiss="modal">Annuler</button>
+                                <button type="button" class="btn bg-blue" id="saveReservation">Enregistrer</button>
                             </div>
                         </div>
                     </form>
@@ -229,6 +209,8 @@
             </div>
         </div>
     </div>
+
+    <?php include 'footer.php'; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="scripts/database.js"></script>
