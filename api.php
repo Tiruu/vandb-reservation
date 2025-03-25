@@ -54,6 +54,16 @@ if ($queryType === 'reservations' && $requestType === 'GET') {
         $row["barnum2Option"] = (int) $row["barnum2Option"];
         $row["photoBoothOption"] = (int) $row["photoBoothOption"];
         $row["beers"] = json_decode($row["beers"], true) ?: []; //Sécurise JSON
+        
+        // Handle the new taps structure
+        if (isset($row["taps"])) {
+            $row["taps"] = json_decode($row["taps"], true) ?: [];
+        } else if (isset($row["tapType"]) && isset($row["tapNumber"])) {
+            // Backward compatibility for old data format
+            $row["taps"] = [["type" => $row["tapType"], "number" => $row["tapNumber"]]];
+        } else {
+            $row["taps"] = [];
+        }
 
         $reservations[] = $row;
     }
@@ -92,30 +102,31 @@ if ($queryType === 'reservations' && $requestType === 'POST' && isset($data["cli
     $barnum2Option = (int) ($data["barnum2Option"] ?? 0);
     $photoBoothOption = (int) ($data["photoBoothOption"] ?? 0);
     $beersJson = json_encode($data["beers"] ?? []);
+    $tapsJson = json_encode($data["taps"] ?? []);  // New line to handle taps as JSON
 
     // 🔍 **Check if ID exists (updating) or not (inserting)**
     if (!empty($data["id"])) {
         // ✅ UPDATE an existing reservation
         $stmt = $conn->prepare("UPDATE reservations SET 
-            clientName = ?, clientPhone = ?, startDate = ?, endDate = ?, tapType = ?, tapNumber = ?, beers = ?, 
+            raisonSociale = ?, clientName = ?, clientPhone = ?, startDate = ?, endDate = ?, taps = ?, beers = ?, 
             barnumOption = ?, barnum2Option = ?, photoBoothOption = ?, comment = ?, isAnnual = ? 
             WHERE id = ?");
         $stmt->bind_param(
-            "sssssssssssii",
-            $data["clientName"], $data["clientPhone"], $data["startDate"], $data["endDate"],
-            $data["tapType"], $data["tapNumber"], $beersJson,
+            "sssssssiiisii",
+            $data["raisonSociale"], $data["clientName"], $data["clientPhone"], $data["startDate"], $data["endDate"],
+            $tapsJson, $beersJson,
             $barnumOption, $barnum2Option, $photoBoothOption,
             $data["comment"], $isAnnual, $data["id"]
         );
     } else {
         // ✅ INSERT a new reservation (id is **automatically** assigned by MySQL)
         $stmt = $conn->prepare("INSERT INTO reservations 
-            (clientName, clientPhone, startDate, endDate, tapType, tapNumber, beers, barnumOption, barnum2Option, photoBoothOption, comment, isAnnual) 
+            (raisonSociale, clientName, clientPhone, startDate, endDate, taps, beers, barnumOption, barnum2Option, photoBoothOption, comment, isAnnual) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         $stmt->bind_param(
-            "sssssssssssi",
-            $data["clientName"], $data["clientPhone"], $data["startDate"], $data["endDate"],
-            $data["tapType"], $data["tapNumber"], $beersJson,
+            "sssssssiiisi",
+            $data["raisonSociale"], $data["clientName"], $data["clientPhone"], $data["startDate"], $data["endDate"],
+            $tapsJson, $beersJson,
             $barnumOption, $barnum2Option, $photoBoothOption,
             $data["comment"], $isAnnual
         );
@@ -132,23 +143,6 @@ if ($queryType === 'reservations' && $requestType === 'POST' && isset($data["cli
         }
     } else {
         echo json_encode(["error" => "SQL Error: " . $stmt->error]);
-    }
-
-    $stmt->close();
-    exit;
-}
-
-if ($queryType === 'beerStock' && $requestType === 'DELETE' && isset($_GET['beerType'])) {
-    $beerType = trim($_GET['beerType']);
-    error_log("Tentative de suppression de: " . $beerType);
-
-    $stmt = $conn->prepare("DELETE FROM inventory WHERE name = ?");
-    $stmt->bind_param("s", $beerType);
-
-    if ($stmt->execute()) {
-        echo json_encode(["message" => "Type de fût supprimé"]);
-    } else {
-        echo json_encode(["error" => "Erreur SQL: " . $stmt->error]);
     }
 
     $stmt->close();
@@ -246,6 +240,16 @@ if ($queryType === 'archives' && $requestType === 'GET') {
         $row["barnum2Option"] = (int) $row["barnum2Option"];
         $row["photoBoothOption"] = (int) $row["photoBoothOption"];
         $row["beers"] = json_decode($row["beers"], true) ?: [];
+        
+        // Handle the new taps structure
+        if (isset($row["taps"])) {
+            $row["taps"] = json_decode($row["taps"], true) ?: [];
+        } else if (isset($row["tapType"]) && isset($row["tapNumber"])) {
+            // Backward compatibility for old data format
+            $row["taps"] = [["type" => $row["tapType"], "number" => $row["tapNumber"]]];
+        } else {
+            $row["taps"] = [];
+        }
 
         $archives[] = $row;
     }

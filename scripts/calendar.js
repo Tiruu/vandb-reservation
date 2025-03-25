@@ -36,7 +36,7 @@
 
     // Equipment inventory - structured by category
     const EQUIPMENT = {
-        'FS': Array.from({ length: 10 }, (_, i) => `FS ${i + 1}`),
+        'FS': Array.from({ length: 10 }, (_, i) => `FS-${i + 1}`),
         'T1': Array.from({ length: 15 }, (_, i) => `T1-${i + 1}`),
         'T2': Array.from({ length: 4 }, (_, i) => `T2-${i + 1}`),
         'Tonneau': Array.from({ length: 3 }, (_, i) => `Tonneau ${i + 1}`),
@@ -195,7 +195,7 @@
                 
                 // Add the equipment name cell
                 const nameCell = document.createElement('td');
-                nameCell.textContent = tapNumber;
+                nameCell.textContent = `${tapNumber}`;
                 row.appendChild(nameCell);
                 
                 // Add cells for each day of the month
@@ -209,12 +209,20 @@
                     }
                     
                     // Find reservations for this equipment on this day
-                    const dayReservations = reservations.filter(res => 
-                        res.tapType === tapType &&
-                        res.tapNumber === tapNumber &&
-                        new Date(res.startDate) <= date &&
-                        new Date(res.endDate) >= date
-                    );
+                    const dayReservations = reservations.filter(res => {
+                        // Check if this tap is in the reservation's taps array
+                        const hasTap = Array.isArray(res.taps) && res.taps.some(tap => 
+                            tap.type === tapType && tap.number === tapNumber
+                        );
+                        
+                        // Support legacy format as a fallback
+                        const hasLegacyTap = res.tapType === tapType && res.tapNumber === tapNumber;
+                        
+                        // Check if the reservation covers this date
+                        const dateInRange = new Date(res.startDate) <= date && new Date(res.endDate) >= date;
+                        
+                        return (hasTap || hasLegacyTap) && dateInRange;
+                    });
                     
                     // If there are reservations, style the cell accordingly
                     if (dayReservations.length > 0) {
@@ -282,15 +290,25 @@
                 
                 // Format beer information
                 const beerInfo = res.beers.length > 0 
-                    ? `${res.beers[0].type} x${res.beers[0].quantity}` 
+                    ? res.beers.map(beer => `${beer.type} x${beer.quantity}`).join(', ')
                     : "Aucun";
+                
+                // Format tap information based on new structure
+                let tapInfo = "Aucune";
+                if (Array.isArray(res.taps) && res.taps.length > 0) {
+                    tapInfo = res.taps.map(tap => `${tap.number}`).join(', ');
+                } else if (res.tapType && res.tapNumber) {
+                    // Legacy format support
+                    tapInfo = `${res.tapNumber}`;
+                }
                 
                 return `
                     <div class="card mb-2">
                         <div class="card-body">
                             <h5 class="card-title">${escapeHtml(res.clientName)}</h5>
-                            <p><strong>Tireuse :</strong> ${escapeHtml(res.tapType)} ${escapeHtml(res.tapNumber)}</p>
-                            <p><strong>Fût :</strong> ${escapeHtml(beerInfo)}</p>
+                            <p><strong>Société :</strong> ${escapeHtml(res.raisonSociale || "Non spécifié")}</p>
+                            <p><strong>Tireuse(s) :</strong> ${escapeHtml(tapInfo)}</p>
+                            <p><strong>Fût(s) :</strong> ${escapeHtml(beerInfo)}</p>
                             <p><strong>Options :</strong> ${escapeHtml(options)}</p>
                             <p><strong>Commentaire :</strong> ${escapeHtml(res.comment || "Aucun")}</p>
                         </div>
@@ -336,10 +354,16 @@
             // Transform and normalize the data
             return data.map(reservation => ({
                 ...reservation,
-                // Parse JSON string if it's a string, or use empty array as fallback
+                // Parse beers JSON if it's a string
                 beers: typeof reservation.beers === 'string' ? 
                     safeJsonParse(reservation.beers, []) : 
                     (Array.isArray(reservation.beers) ? reservation.beers : []),
+                
+                // Parse taps JSON if it's a string
+                taps: typeof reservation.taps === 'string' ?
+                    safeJsonParse(reservation.taps, []) :
+                    (Array.isArray(reservation.taps) ? reservation.taps : []),
+                
                 // Convert string boolean values to actual booleans
                 barnumOption: convertToBoolean(reservation.barnumOption),
                 barnum2Option: convertToBoolean(reservation.barnum2Option),
