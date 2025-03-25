@@ -15,7 +15,7 @@
 
         <!-- Sélection de la semaine -->
         <div class="mb-3">
-            <label for="weekStartDate" class="form-label">Date de dernière livraison</label>
+            <label for="weekStartDate" class="form-label">Début de semaine</label>
             <input type="date" id="weekStartDate" class="form-control">
         </div>
 
@@ -31,7 +31,7 @@
                         <tr>
                             <th>Type de Fût</th>
                             <th>Stock Théorique</th>
-                            <th>Quantité réservée (période de 2 semaines depuis livraison)</th>
+                            <th>Quantité réservée sur la semaine sélectionnée</th>
                             <th>Stock Réel</th>
                             <th>Actions</th>
                         </tr>
@@ -77,6 +77,8 @@
 </table>
 
     </div>
+
+    <?php include 'footer.php'; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="scripts/inventory.js"></script>

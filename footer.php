@@ -8,13 +8,13 @@
             <div class="col-md-8 text-center text-md-right">
                 <ul class="nav justify-content-center justify-content-md-end">
                     <li class="nav-item">
-                        <a class="nav-link active" href="index.html">Réservations</a>
+                        <a class="nav-link active" href="index.php">Réservations</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="calendar.html">Calendrier</a>
+                        <a class="nav-link" href="calendar.php">Calendrier</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="inventory.html">Stocks</a>
+                        <a class="nav-link" href="inventory.php">Stocks</a>
                     </li>
                 </ul>
             </div>

@@ -927,7 +927,7 @@ const CONFIG = {
       row.innerHTML = `
           <td>${reservation.raisonSociale}</td>
           <td>${reservation.clientName}</td>
-          <td>${reservation.clientPhone || '-'}</td>
+          <td>${reservation.clientPhone ? reservation.clientPhone.replace(/(\d{2})/g, '$1 ').trim() : '-'}</td>
           <td>${Utilities.formatDate(reservation.startDate)}</td>
           <td>${Utilities.formatDate(reservation.endDate)}</td>
           <td>${tapDisplay}</td>

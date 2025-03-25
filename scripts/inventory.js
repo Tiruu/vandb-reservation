@@ -470,7 +470,7 @@ async function getBeerStockUsedOverTwoWeeks(beerType, startDate) {
     startOfPeriod.setHours(0, 0, 0, 0);
 
     const endOfPeriod = new Date(startOfPeriod);
-    endOfPeriod.setDate(startOfPeriod.getDate() + 13); // Two weeks (14 days)
+    endOfPeriod.setDate(startOfPeriod.getDate() + 6); 
     endOfPeriod.setHours(23, 59, 59, 999);
 
     return reservations.reduce((total, reservation) => {
