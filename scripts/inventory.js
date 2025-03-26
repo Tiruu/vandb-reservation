@@ -369,11 +369,11 @@ function updateEquipmentUI(equipment) {
 
   // Update rental periods
   document.getElementById('barnum3x3-dates').textContent = equipment.barnum3x3.periods.length ?
-    equipment.barnum3x3.periods.join('\n') : '-';
+    equipment.barnum3x3.periods.join(' || \n') : '-';
   document.getElementById('barnum3x6-dates').textContent = equipment.barnum3x6.periods.length ?
-    equipment.barnum3x6.periods.join('\n') : '-';
+    equipment.barnum3x6.periods.join(' || \n') : '-';
   document.getElementById('photobooth-dates').textContent = equipment.photobooth.periods.length ?
-    equipment.photobooth.periods.join('\n') : '-';
+    equipment.photobooth.periods.join(' || \n') : '-';
 }
 
 /**
@@ -470,7 +470,7 @@ async function getBeerStockUsedOverTwoWeeks(beerType, startDate) {
     startOfPeriod.setHours(0, 0, 0, 0);
 
     const endOfPeriod = new Date(startOfPeriod);
-    endOfPeriod.setDate(startOfPeriod.getDate() + 6); 
+    endOfPeriod.setDate(startOfPeriod.getDate() + 6);
     endOfPeriod.setHours(23, 59, 59, 999);
 
     return reservations.reduce((total, reservation) => {
@@ -485,7 +485,7 @@ async function getBeerStockUsedOverTwoWeeks(beerType, startDate) {
       resEndDate.setHours(23, 59, 59, 999);
 
       // **Exclude reservations that have already ended**
-      if (resStartDate < today) {
+      if (resStartDate <= today) {
         return total;
       }
 

@@ -67,24 +67,20 @@
     color: white !important;
 }
 
-/* 🔶 Highlight today's column */
+
 .today-column {
     background-color: var(--light-yellow) !important;
 }
-
-/* 🔵 Annual reservations in blue */
 .annual-reserved {
     background-color: var(--blue) !important;
     color: white;
 }
-
-/* ✅ Normal reservations in green */
 .reserved {
     background-color: var(--green) !important;
     color: white;
 }
 .archived{
-    background-color: #3b3b3b !important;
+    background-color: var(--orange) !important;
     color: white;
 }
 

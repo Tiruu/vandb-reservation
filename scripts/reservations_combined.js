@@ -449,17 +449,17 @@ const CONFIG = {
       styleElement.textContent = `
         /* Target Bootstrap's custom property mechanism */
         tr.${CONFIG.RESERVATION_STATUS.ACTIVE} {
-          --bs-table-accent-bg: rgba(58, 143, 140, 0.15) !important;
-          --bs-table-bg-type: rgba(58, 143, 140, 0.15) !important;
-          --bs-table-bg-state: rgba(58, 143, 140, 0.15) !important;
-          --bs-table-bg: rgba(58, 143, 140, 0.15) !important;
+          --bs-table-accent-bg: rgba(58, 143, 140, 0.40) !important;
+          --bs-table-bg-type: rgba(58, 143, 140, 0.40) !important;
+          --bs-table-bg-state: rgba(58, 143, 140, 0.40) !important;
+          --bs-table-bg: rgba(58, 143, 140, 0.40) !important;
         }
 
         tr.${CONFIG.RESERVATION_STATUS.EXPIRED} {
-          --bs-table-accent-bg: rgba(233, 96, 41, 0.15) !important;
-          --bs-table-bg-type: rgba(233, 96, 41, 0.15) !important;
-          --bs-table-bg-state: rgba(233, 96, 41, 0.15) !important;
-          --bs-table-bg: rgba(233, 96, 41, 0.15) !important;
+          --bs-table-accent-bg: rgba(233, 96, 41, 0.40) !important;
+          --bs-table-bg-type: rgba(233, 96, 41, 0.40) !important;
+          --bs-table-bg-state: rgba(233, 96, 41, 0.40) !important;
+          --bs-table-bg: rgba(233, 96, 41, 0.40) !important;
         }
 
         /* Override the box-shadow approach for maximum compatibility */
@@ -470,11 +470,11 @@ const CONFIG = {
 
         /* Apply direct background-color as a fallback */
         tr.${CONFIG.RESERVATION_STATUS.ACTIVE} > * {
-          background-color: rgba(58, 143, 140, 0.15) !important;
+          background-color: rgba(58, 143, 140, 0.40) !important;
         }
 
         tr.${CONFIG.RESERVATION_STATUS.EXPIRED} > * {
-          background-color: rgba(233, 96, 41, 0.15 0.15) !important;
+          background-color: rgba(233, 96, 41, 0.40 0.40) !important;
         }
       `;
       document.head.appendChild(styleElement);
@@ -935,8 +935,8 @@ const CONFIG = {
           <td>${equipmentOptions || '-'}</td>
           <td>${reservation.comment || '-'}</td>
           <td>
-              <button class="btn btn-sm bg-blue edit-btn" data-id="${reservation.id}">Modifier</button>
-              <button class="btn btn-sm bg-orange delete-btn" data-id="${reservation.id}">Supprimer</button>
+              <button class="btn btn-sm bg-blue-green edit-btn" data-id="${reservation.id}">Modifier</button>
+              <button class="btn btn-sm bg-black delete-btn text-white" data-id="${reservation.id}">Supprimer</button>
               <button class="btn btn-sm bg-yellow archive-btn" data-id="${reservation.id}">Archiver</button>
           </td>
       `;

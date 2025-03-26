@@ -20,7 +20,8 @@
         cssClasses: {
             todayColumn: 'today-column',
             reserved: 'reserved',
-            annualReserved: 'annual-reserved'
+            annualReserved: 'annual-reserved',
+            archived: 'archived'
         },
         selectors: {
             calendarHeader: '#calendarHeader',
@@ -234,12 +235,17 @@
                     if (dayReservations.length > 0) {
                         // Check if any reservation is annual
                         const hasAnnualReservation = dayReservations.some(res => res.isAnnual);
-                        
-                        // Apply appropriate class
-                        cell.classList.add(hasAnnualReservation ? 
-                            cssClasses.annualReserved : 
-                            cssClasses.reserved
-                        );
+                        const isArchived = dayReservations.some(res => res.isArchived);  // Make sure to adjust based on how you mark archives in your data
+
+                        if (isArchived) {
+                            cell.classList.add(cssClasses.archived);
+                        } else if (hasAnnualReservation) {
+                            cell.classList.add(cssClasses.annualReserved);
+                        } else {
+                            cell.classList.add(cssClasses.reserved);
+                        }
+
+                       
                         
                         // Add tooltip with reservation info
                         cell.title = dayReservations.map(res => {
@@ -336,52 +342,95 @@
         }
     }
 
-    /**
-     * Fetch reservations from the API
-     * @returns {Promise<Array>} Array of reservation objects
-     */
-    async function fetchReservations() {
-        try {
-            const response = await fetch(`${CONFIG.apiEndpoint}?type=reservations`);
-            
-            // Check if the request was successful
-            if (!response.ok) {
-                throw new Error(`API error: ${response.status} ${response.statusText}`);
-            }
-            
-            const data = await response.json();
-            
-            // Validate the response data
-            if (!Array.isArray(data)) {
-                console.error("ERROR: API did not return an array:", data);
-                return [];
-            }
-            
-            // Transform and normalize the data
-            return data.map(reservation => ({
-                ...reservation,
-                // Parse beers JSON if it's a string
-                beers: typeof reservation.beers === 'string' ? 
-                    safeJsonParse(reservation.beers, []) : 
-                    (Array.isArray(reservation.beers) ? reservation.beers : []),
-                
-                // Parse taps JSON if it's a string
-                taps: typeof reservation.taps === 'string' ?
-                    safeJsonParse(reservation.taps, []) :
-                    (Array.isArray(reservation.taps) ? reservation.taps : []),
-                
-                // Convert string boolean values to actual booleans
-                barnumOption: convertToBoolean(reservation.barnumOption),
-                barnum2Option: convertToBoolean(reservation.barnum2Option),
-                photoBoothOption: convertToBoolean(reservation.photoBoothOption),
-                isAnnual: convertToBoolean(reservation.isAnnual)
-            }));
-            
-        } catch (error) {
-            console.error("ERROR: Fetching reservations failed:", error);
-            throw error; // Re-throw to allow handling by the caller
+/**
+ * Fetch reservations from the API
+ * @returns {Promise<Array>} Array of reservation objects including both active and archived
+ */
+async function fetchReservations() {
+    try {
+        // Fetch active reservations
+        const activeReservationsResponse = await fetch(`${CONFIG.apiEndpoint}?type=reservations`);
+        const archivedReservationsResponse = await fetch(`${CONFIG.apiEndpoint}?type=archives`);
+
+        // Check if both requests were successful
+        if (!activeReservationsResponse.ok || !archivedReservationsResponse.ok) {
+            throw new Error(`API error: ${activeReservationsResponse.statusText}, ${archivedReservationsResponse.statusText}`);
         }
+
+        // Parse JSON data
+        const activeReservationsData = await activeReservationsResponse.json();
+        const archivedReservationsData = await archivedReservationsResponse.json();
+
+        // Validate that both are arrays
+        if (!Array.isArray(activeReservationsData) || !Array.isArray(archivedReservationsData)) {
+            console.error("ERROR: API did not return an array:", activeReservationsData, archivedReservationsData);
+            return [];
+        }
+
+        // Mark archived reservations and normalize both datasets
+        const activeReservations = normalizeReservations(activeReservationsData);
+        const archivedReservations = normalizeReservations(archivedReservationsData, true);
+
+        // Combine and return the data
+        return activeReservations.concat(archivedReservations);
+    } catch (error) {
+        console.error("ERROR fetching reservations:", error);
+        return [];  // Return an empty array in case of error to avoid application crashes
     }
+}
+
+/**
+ * Normalize reservation data and mark as archived if needed
+ * @param {Array} data Array of reservation objects from the API
+ * @param {boolean} isArchived Flag to mark all reservations in the array as archived
+ * @returns {Array} Normalized array of reservation objects
+ */
+function normalizeReservations(data, isArchived = false) {
+    return data.map(reservation => ({
+        ...reservation,
+        // Add isArchived flag if it's provided
+        isArchived: isArchived,
+        // Parse beers and taps JSON, and convert boolean strings to boolean values
+        beers: typeof reservation.beers === 'string' ?
+            safeJsonParse(reservation.beers, []) :
+            (Array.isArray(reservation.beers) ? reservation.beers : []),
+        taps: typeof reservation.taps === 'string' ?
+            safeJsonParse(reservation.taps, []) :
+            (Array.isArray(reservation.taps) ? reservation.taps : []),
+        barnumOption: convertToBoolean(reservation.barnumOption),
+        barnum2Option: convertToBoolean(reservation.barnum2Option),
+        photoBoothOption: convertToBoolean(reservation.photoBoothOption),
+        isAnnual: convertToBoolean(reservation.isAnnual)
+    }));
+}
+
+/**
+ * Convert various values to boolean
+ * @param {*} value - Value to convert
+ * @returns {boolean} Converted boolean value
+ */
+function convertToBoolean(value) {
+    if (typeof value === 'boolean') return value;
+    if (typeof value === 'string') {
+        return value === '1' || value.toLowerCase() === 'true';
+    }
+    return !!value; // Convert to boolean
+}
+
+/**
+ * Safely parse JSON with a fallback value
+ * @param {string} jsonString - The JSON string to parse
+ * @param {*} fallback - Fallback value if parsing fails
+ * @returns {*} Parsed object or fallback value
+ */
+function safeJsonParse(jsonString, fallback) {
+    try {
+        return JSON.parse(jsonString);
+    } catch (e) {
+        console.warn("Failed to parse JSON:", e);
+        return fallback;
+    }
+}
 
     /**
      * Safely parse JSON with a fallback value

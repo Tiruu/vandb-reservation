@@ -224,6 +224,9 @@ if ($queryType === 'archiveAndDelete' && $requestType === 'POST' && isset($_GET[
     exit;
 }
 
+/* =======================
+Rservation Archives fetch
+======================= */
 if ($queryType === 'archives' && $requestType === 'GET') {
     $sql = "SELECT * FROM archives ORDER BY startDate ASC";
     $result = $conn->query($sql);
