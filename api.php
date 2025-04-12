@@ -278,6 +278,45 @@ if ($queryType === 'deleteArchive' && $requestType === 'DELETE' && isset($_GET['
     exit;
 }
 
+/* =======================
+Deleting a Beer Type from Inventory
+======================= */
+if ($queryType === 'inventory' && $requestType === 'DELETE' && isset($_GET['beerId'])) {
+    $beerId = trim($_GET['beerId']); // Make sure beerId is properly trimmed
+
+    // Prepare the query to check if the beer type exists
+    $sql = "SELECT * FROM inventory WHERE name = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $beerId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    // If the beer type doesn't exist, return an error
+    if ($result->num_rows === 0) {
+        echo json_encode(["error" => "Beer type not found"]);
+        $stmt->close();
+        exit;
+    }
+
+    // Prepare the DELETE query to remove the beer type
+    $deleteSql = "DELETE FROM inventory WHERE name = ?";
+    $deleteStmt = $conn->prepare($deleteSql);
+    $deleteStmt->bind_param("s", $beerId);
+
+    // Execute the DELETE query
+    if ($deleteStmt->execute()) {
+        echo json_encode(["message" => "Beer type deleted successfully"]);
+    } else {
+        echo json_encode(["error" => "SQL Error: " . $deleteStmt->error]);
+    }
+
+    // Close statements
+    $deleteStmt->close();
+    $stmt->close();
+    exit;
+}
+
+
 
 
 //Ending DB connection

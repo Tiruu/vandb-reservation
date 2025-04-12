@@ -159,38 +159,32 @@ async function saveBeerStock(beerType, stock) {
   }
 }
 
-/**
- * Deletes a beer type from inventory.
- *
- * @param {string} beerType - The type of beer to delete
- * @returns {Promise<boolean>} Success status
- */
-async function deleteBeerTypeFromInventory(beerType) {
-  try {
-    const response = await fetch(
-      `${API_BASE_URL}?type=beerStock&beerType=${encodeURIComponent(beerType)}`,
-      { method: 'DELETE' }
-    );
+async function deleteBeerTypeFromInventory(beerId) {
+    try {
+        const response = await fetch(`api.php?type=inventory&beerId=${encodeURIComponent(beerId)}`, {
+            method: 'DELETE'
+        });
 
-    if (!response.ok) {
-      throw new Error(`API returned status ${response.status}`);
+        if (!response.ok) {
+            throw new Error(`API returned status ${response.status}`);
+        }
+
+        const result = await response.json();
+
+        if (result.error) {
+            throw new Error(result.error);
+        }
+
+        // Invalidate the inventory cache
+        apiCache.inventory.timestamp = 0;
+
+        return true;
+    } catch (error) {
+        showError('Failed to delete beer type', error);
+        return false;
     }
-
-    const result = await response.json();
-
-    if (result.error) {
-      throw new Error(result.error);
-    }
-
-    // Invalidate the inventory cache
-    apiCache.inventory.timestamp = 0;
-
-    return true;
-  } catch (error) {
-    showError('Failed to delete beer type', error);
-    return false;
-  }
 }
+
 
 /**
  * UI Update Functions
