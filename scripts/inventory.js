@@ -426,6 +426,7 @@ async function editStockTheorique(event) {
 
   if (success) {
     await updateInventoryDisplay();
+    localStorage.setItem('lastModification', new Date().toISOString());
   }
 }
 
@@ -478,11 +479,6 @@ async function getBeerStockUsedOverTwoWeeks(beerType, startDate) {
       resStartDate.setHours(0, 0, 0, 0);
       resEndDate.setHours(23, 59, 59, 999);
 
-      // **Exclude reservations that have already ended**
-      if (resStartDate <= today) {
-        return total;
-      }
-
       // Include only reservations that fall within the period
       if (resStartDate >= startOfPeriod && resStartDate <= endOfPeriod) {
         const beer = reservation.beers.find(b => b.type.trim() === beerType);
@@ -529,6 +525,30 @@ function getMonday(date) {
   const diff = result.getDate() - day + (day === 0 ? -6 : 1);
   result.setDate(diff);
   return result;
+}
+
+/**
+ * Display the time since last stock modifications
+ * 
+ * 
+ * 
+ */
+function getTimeSinceLastModification() {
+    const lastModification = localStorage.getItem('lastModification');
+    if (!lastModification) {
+        return 'Aucune modification récente';
+    }
+    const lastModificationDate = new Date(lastModification);
+    const now = new Date();
+    const diff = now.getTime() - lastModificationDate.getTime();
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    if (days === 0) {
+        return 'Il y a quelques minutes';
+    }
+    if (days === 1) {
+        return 'Il y a une heure';
+    }
+    return `Il y a ${days} jours`;
 }
 
 /**
