@@ -31,6 +31,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   weekStartInput.value = getMonday(new Date()).toISOString().split('T')[0];
   weekStartInput.addEventListener('change', updateInventoryDisplay);
 
+  document.getElementById('stockModification').textContent = getTimeSinceLastModification();
   // Initial data loading
   try {
     await Promise.all([
@@ -411,24 +412,33 @@ async function editStockTheorique(event) {
 
   const newValue = prompt(`Modifier le stock théorique de ${beerType}:`, currentStock);
 
-  if (newValue === null) {
-    return; // User cancelled
-  }
+  if (newValue === null) return;
 
   const quantity = parseInt(newValue, 10);
-
   if (isNaN(quantity) || quantity < 0) {
     alert('❌ Veuillez entrer une valeur numérique positive.');
     return;
   }
 
   const success = await saveBeerStock(beerType, quantity);
-
   if (success) {
     await updateInventoryDisplay();
-    localStorage.setItem('lastModification', new Date().toISOString());
+    const timestamp = new Date().toISOString();
+    localStorage.setItem('lastModification', timestamp);
+    console.log('✅ Stock updated at', timestamp);
+  
+    const modElem = document.getElementById('stockModification');
+    if (modElem) {
+      const value = getTimeSinceLastModification();
+      modElem.textContent = value;
+      console.log('🟢 Updated UI with:', value);
+    } else {
+      console.warn('❗ #stockModification not found');
+    }
   }
+  
 }
+
 
 /**
  * Handles deleting a beer type from inventory.
@@ -438,16 +448,19 @@ async function editStockTheorique(event) {
 async function deleteBeerType(event) {
   const beerType = event.target.dataset.beer.trim();
 
-  if (!confirm(`Supprimer ${beerType} du stock ?`)) {
-    return;
-  }
+  if (!confirm(`Supprimer ${beerType} du stock ?`)) return;
 
   const success = await deleteBeerTypeFromInventory(beerType);
-
   if (success) {
     await updateInventoryDisplay();
+    localStorage.setItem('lastModification', new Date().toISOString());
+
+    // 🆕 Optional: update the visible timestamp immediately
+    const modElem = document.getElementById('stockModification');
+    if (modElem) modElem.textContent = getTimeSinceLastModification();
   }
 }
+
 
 /**
  * Utility Functions
@@ -534,22 +547,24 @@ function getMonday(date) {
  * 
  */
 function getTimeSinceLastModification() {
-    const lastModification = localStorage.getItem('lastModification');
-    if (!lastModification) {
-        return 'Aucune modification récente';
-    }
-    const lastModificationDate = new Date(lastModification);
-    const now = new Date();
-    const diff = now.getTime() - lastModificationDate.getTime();
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    if (days === 0) {
-        return 'Il y a quelques minutes';
-    }
-    if (days === 1) {
-        return 'Il y a une heure';
-    }
-    return `Il y a ${days} jours`;
+  const lastModification = localStorage.getItem('lastModification');
+  if (!lastModification) {
+      return 'Aucune modification récente';
+  }
+
+  const lastDate = new Date(lastModification);
+
+  // Format date and time as DD/MM/YYYY HH:MM
+  const day = String(lastDate.getDate()).padStart(2, '0');
+  const month = String(lastDate.getMonth() + 1).padStart(2, '0');
+  const year = lastDate.getFullYear();
+
+  const hours = String(lastDate.getHours()).padStart(2, '0');
+  const minutes = String(lastDate.getMinutes()).padStart(2, '0');
+
+  return `Le ${day}/${month}/${year} à ${hours}h${minutes}`;
 }
+
 
 /**
  * Formats a date string from YYYY-MM-DD to DD-MM-YYYY.

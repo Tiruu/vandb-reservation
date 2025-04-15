@@ -13,6 +13,10 @@
         <div class="card mb-4">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">Fûts de Bière</h5>
+                <p class="mb-0">
+                    Dernière modification du stock le : <span id="stockModification">-</span>
+                </p>
+
                 <button class="btn btn-sm btn-success" id="addBeerTypeBtn">+ Ajouter un type de fût</button>
             </div>
             <div class="card-body">
