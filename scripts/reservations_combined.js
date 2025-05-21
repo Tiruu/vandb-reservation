@@ -1,4 +1,4 @@
-/**
+	/**
  * Reservation Management System
  *
  * A comprehensive application for managing beer tap reservations, including
@@ -819,9 +819,13 @@ const CONFIG = {
       const annualTableBody = document.getElementById('annualReservationsTableBody');
       const regularTableBody = document.getElementById('regularReservationsTableBody');
 
-      // Clear existing table data
-      annualTableBody.innerHTML = '';
-      regularTableBody.innerHTML = '';
+  if (annualTableBody) {
+    annualTableBody.innerHTML = '';
+  }
+
+  if (regularTableBody) {
+    regularTableBody.innerHTML = '';
+  }
 
       // Add reservation rows to appropriate tables
       reservations.forEach(reservation => {

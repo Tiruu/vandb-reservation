@@ -18,13 +18,13 @@
             <div class="collapse navbar-collapse " id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link" aria-current="page" href="index.php">Réservations</a>
+                        <a class="nav-link" aria-current="page" href="index.php">-Réservations Particulier-</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="calendar.php">Calendrier</a>
+                        <a class="nav-link" href="calendar.php">-Calendrier-</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="inventory.php">Stocks</a>
+                        <a class="nav-link" href="inventory.php">-Stocks / Gestions-</a>
                     </li>
                 </ul>
             </div>
