@@ -5,41 +5,7 @@
         <button class="btn bg-blue-green mb-3" id="addReservationBtn">+ Ajouter une Réservation</button>
 
         <!-- Accordéon pour les réservations -->
-        <div class="accordion" id="reservationsAccordion">
-            <!-- Accordéon des réservations annuelles -->
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="annualReservationsHeader">
-                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#annualReservationsCollapse" aria-expanded="true" aria-controls="annualReservationsCollapse">
-                        Réservations Annuelles <span class="badge bg-light-orange ms-2">0</span>
-                    </button>
-                </h2>
-                <div id="annualReservationsCollapse" class="accordion-collapse collapse show" aria-labelledby="annualReservationsHeader">
-                    <div class="accordion-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-striped mb-0">
-                                <thead>
-                                    <tr>
-                                        <th>Raison sociale</th>
-                                        <th>Nom / prénom</th>
-                                        <th>Téléphone</th>
-                                        <th>Début</th>
-                                        <th>Fin</th>
-                                        <th>Tireuse</th>
-                                        <th>Fûts</th>
-                                        <th>Options</th>
-                                        <th>Commentaires</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="annualReservationsTableBody">
-                                    <!-- Les réservations annuelles seront injectées ici -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
+        <div class="accordion" id="reservationsAccordion">  
             <!-- Accordéon des réservations classiques -->
             <div class="accordion-item">
                 <h2 class="accordion-header" id="regularReservationsHeader">
@@ -73,41 +39,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Accordéon des réservations archivées (NOUVEAU) -->
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="archivedReservationsHeader">
-                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#archivedReservationsCollapse" aria-expanded="true" aria-controls="archivedReservationsCollapse">
-                        Archives <span class="badge bg-light-orange ms-2">0</span>
-                    </button>
-                </h2>
-                <div id="archivedReservationsCollapse" class="accordion-collapse collapse show" aria-labelledby="archivedReservationsHeader">
-                    <div class="accordion-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-striped mb-0">
-                                <thead>
-                                    <tr>
-                                        <th>Raison sociale</th>
-                                        <th>Client</th>
-                                        <th>Téléphone</th>
-                                        <th>Début</th>
-                                        <th>Fin</th>
-                                        <th>Tireuse</th>
-                                        <th>Fûts</th>
-                                        <th>Options</th>
-                                        <th>Commentaires</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="archivedReservationsTableBody">
-                                    <!-- Les réservations archivées seront injectées ici -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
         </div>
     </div>
 
@@ -123,16 +54,8 @@
                     <form id="reservationForm">
                         <div class="row">
                             <div class="col-md-6">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="annualReservation">
-                                    <label class="form-check-label" for="annualReservation">Réservation Annuelle</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
                                 <label>Raison sociale</label>
-                                <input type="text" id="raisonSociale" class="form-control" required>
+                                <input type="text" id="raisonSociale" name="raisonSociale" class="form-control" required>
                                 <label>Nom du Client</label>
                                 <input type="text" id="clientName" class="form-control" required>
                                 <label>Téléphone</label>
@@ -202,6 +125,10 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="scripts/database.js"></script>
-    <script src="scripts/reservations_combined.js"></script>
+    <script src="scripts/config.js"></script>
+    <script src="scripts/utilities.js"></script>
+    <script src="scripts/apiservices.js"></script> 
+    <script src="scripts/reservation_and_equipement_manager.js"></script>
+    <script src="scripts/dominit.js"></script>
 </body>
 </html>

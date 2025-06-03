@@ -21,6 +21,12 @@
                         <a class="nav-link" aria-current="page" href="index.php">-Réservations Particulier-</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" aria-current="page" href="annual.php">-Réservations Longues durées-</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" aria-current="page" href="archives.php">-Archives-</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="calendar.php">-Calendrier-</a>
                     </li>
                     <li class="nav-item">

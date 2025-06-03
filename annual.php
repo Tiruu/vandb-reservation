@@ -20,7 +20,7 @@
                                 <thead>
                                     <tr>
                                         <th>Raison sociale</th>
-                                        <th>Nom / prénom</th>
+                                        <th>Client</th>
                                         <th>Téléphone</th>
                                         <th>Début</th>
                                         <th>Fin</th>
@@ -134,6 +134,10 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="scripts/database.js"></script>
-    <script src="scripts/reservations_combined.js"></script>
+    <script src="scripts/config.js"></script>
+    <script src="scripts/utilities.js"></script>
+    <script src="scripts/apiservices.js"></script> 
+    <script src="scripts/reservation_and_equipement_manager.js"></script>
+    <script src="scripts/dominit.js"></script>
 </body>
 </html>

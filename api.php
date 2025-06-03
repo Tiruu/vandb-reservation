@@ -1,15 +1,29 @@
 <?php
-header("Access-Control-Allow-Origin: *");
-header("Content-Type: application/json");
-
+// suppress warnings early
+ini_set('display_errors',   '1');
+ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
-ini_set('display_errors', 1);
+
+// CORS preflight handling
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    header('Access-Control-Allow-Origin: *');
+    header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+    header('Access-Control-Allow-Headers: Content-Type');
+    exit(0);
+}
+
+// now your normal headers
+header("Access-Control-Allow-Origin: *");
+header("Content-Type: application/json; charset=utf-8");
+
+
+
 
 // Connecting to the DB
 $host = "localhost";
-$user = "root";
-$password = "";
-$dbname = "location_tireuse";
+$user = "lino";
+$password = "3sca01SQL&";
+$dbname = "reservations_database";
 
 $conn = new mysqli($host, $user, $password, $dbname);
 if ($conn->connect_error) {
@@ -49,7 +63,9 @@ if ($queryType === 'reservations' && $requestType === 'GET') {
 
     $reservations = [];
     while ($row = $result->fetch_assoc()) {
-        $row["isAnnual"] = (int) $row["isAnnual"];
+        $row['isAnnual'] = isset($row['isAnnual'])
+            ? (int) $row['isAnnual']
+            : 0;
         $row["barnumOption"] = (int) $row["barnumOption"];
         $row["barnum2Option"] = (int) $row["barnum2Option"];
         $row["photoBoothOption"] = (int) $row["photoBoothOption"];
@@ -96,58 +112,96 @@ if ($queryType === 'inventory' && $requestType === 'GET') {
 /* =======================
 Adding / Updating a reservation
 ======================= */
-if ($queryType === 'reservations' && $requestType === 'POST' && isset($data["clientName"])) {
-    $isAnnual = (int) ($data["isAnnual"] ?? 0);
-    $barnumOption = (int) ($data["barnumOption"] ?? 0);
-    $barnum2Option = (int) ($data["barnum2Option"] ?? 0);
+/* =======================
+Adding / Updating a reservation
+======================= */
+if ($queryType === 'reservations' && $requestType === 'POST') {
+    // Fetch and sanitize incoming data
+    $barnumOption   = (int) ($data["barnumOption"]  ?? 0);
+    $barnum2Option  = (int) ($data["barnum2Option"] ?? 0);
     $photoBoothOption = (int) ($data["photoBoothOption"] ?? 0);
-    $beersJson = json_encode($data["beers"] ?? []);
-    $tapsJson = json_encode($data["taps"] ?? []);  // New line to handle taps as JSON
+    $beersJson      = json_encode($data["beers"] ?? []);
+    $tapsJson       = json_encode($data["taps"]  ?? []);
+    $comment        = $conn->real_escape_string($data["comment"] ?? '');
 
-    // 🔍 **Check if ID exists (updating) or not (inserting)**
+    // Validate required fields
+    if (empty($data["clientName"]) || empty($data["raisonSociale"]) || empty($data["startDate"]) || empty($data["endDate"])) {
+        echo json_encode(["error" => "Required fields missing"]);
+        exit;
+    }
+
+    // Decide whether to INSERT or UPDATE
     if (!empty($data["id"])) {
-        // ✅ UPDATE an existing reservation
-        $stmt = $conn->prepare("UPDATE reservations SET 
-            raisonSociale = ?, clientName = ?, clientPhone = ?, startDate = ?, endDate = ?, taps = ?, beers = ?, 
-            barnumOption = ?, barnum2Option = ?, photoBoothOption = ?, comment = ?, isAnnual = ? 
-            WHERE id = ?");
+        // UPDATE existing reservation
+        $stmt = $conn->prepare("
+            UPDATE reservations SET 
+                raisonSociale   = ?,
+                clientName      = ?,
+                clientPhone     = ?,
+                startDate       = ?,
+                endDate         = ?,
+                taps            = ?,
+                beers           = ?,
+                barnumOption    = ?,
+                barnum2Option   = ?,
+                photoBoothOption= ?,
+                comment         = ?
+            WHERE id = ?
+        ");
         $stmt->bind_param(
-            "sssssssiiisii",
-            $data["raisonSociale"], $data["clientName"], $data["clientPhone"], $data["startDate"], $data["endDate"],
-            $tapsJson, $beersJson,
-            $barnumOption, $barnum2Option, $photoBoothOption,
-            $data["comment"], $isAnnual, $data["id"]
+            "ssssssiiisi",
+            $data["raisonSociale"],
+            $data["clientName"],
+            $data["clientPhone"],
+            $data["startDate"],
+            $data["endDate"],
+            $tapsJson,
+            $beersJson,
+            $barnumOption,
+            $barnum2Option,
+            $photoBoothOption,
+            $comment,
+            $data["id"]
         );
     } else {
-        // ✅ INSERT a new reservation (id is **automatically** assigned by MySQL)
-        $stmt = $conn->prepare("INSERT INTO reservations 
-            (raisonSociale, clientName, clientPhone, startDate, endDate, taps, beers, barnumOption, barnum2Option, photoBoothOption, comment, isAnnual) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        // INSERT new reservation
+        $stmt = $conn->prepare("
+            INSERT INTO reservations
+            (raisonSociale, clientName, clientPhone, startDate, endDate, taps, beers, barnumOption, barnum2Option, photoBoothOption, comment)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ");
         $stmt->bind_param(
-            "sssssssiiisi",
-            $data["raisonSociale"], $data["clientName"], $data["clientPhone"], $data["startDate"], $data["endDate"],
-            $tapsJson, $beersJson,
-            $barnumOption, $barnum2Option, $photoBoothOption,
-            $data["comment"], $isAnnual
+            "ssssssiiiss",
+            $data["raisonSociale"],
+            $data["clientName"],
+            $data["clientPhone"],
+            $data["startDate"],
+            $data["endDate"],
+            $tapsJson,
+            $beersJson,
+            $barnumOption,
+            $barnum2Option,
+            $photoBoothOption,
+            $comment
         );
     }
 
-    // Execute SQL query
-    if ($stmt->execute()) {
-        //If inserting, return the newly created ID
-        if (empty($data["id"])) {
-            $newId = $stmt->insert_id; // Get the last inserted ID
-            echo json_encode(["message" => "Nouvelle réservation créée", "id" => $newId]);
-        } else {
-            echo json_encode(["message" => "Réservation mise à jour"]);
-        }
-    } else {
+    if (!$stmt->execute()) {
         echo json_encode(["error" => "SQL Error: " . $stmt->error]);
+        exit;
+    }
+
+    // Return success (and new ID on insert)
+    if (empty($data["id"])) {
+        echo json_encode(["message" => "Nouvelle réservation créée", "id" => $stmt->insert_id]);
+    } else {
+        echo json_encode(["message" => "Réservation mise à jour"]);
     }
 
     $stmt->close();
     exit;
 }
+
 
 /* =======================
 Deleting a reservation
@@ -238,7 +292,9 @@ if ($queryType === 'archives' && $requestType === 'GET') {
 
     $archives = [];
     while ($row = $result->fetch_assoc()) {
-        $row["isAnnual"] = (int) $row["isAnnual"];
+        $row['isAnnual'] = isset($row['isAnnual'])
+            ? (int) $row['isAnnual']
+            : 0;
         $row["barnumOption"] = (int) $row["barnumOption"];
         $row["barnum2Option"] = (int) $row["barnum2Option"];
         $row["photoBoothOption"] = (int) $row["photoBoothOption"];
