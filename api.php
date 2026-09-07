@@ -21,9 +21,9 @@ header("Content-Type: application/json; charset=utf-8");
 
 // Connecting to the DB
 $host = "localhost";
-$user = "lino";
-$password = "3sca01SQL&";
-$dbname = "reservations_database";
+$user = "root";
+$password = "";
+$dbname = "location_tireuse";
 
 $conn = new mysqli($host, $user, $password, $dbname);
 if ($conn->connect_error) {
