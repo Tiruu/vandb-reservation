@@ -1,21 +1,12 @@
-	/**
+/**
  * Reservation Management System
  *
- * A comprehensive application for managing beer tap reservations, including
- * creation, editing, archiving, and deletion of reservations, as well as
- * equipment availability management.
- *
- * @author Optimized by AI Assistant
- * @version 2.0.0
- */
-
-/**
- * Configuration object to store application settings
+ * Central application configuration.
  */
 const CONFIG = {
     API_BASE_URL: '/api.php',
     DATE_FORMAT: 'DD-MM-YYYY',
-    DEBUG: true,
+    DEBUG: false,
     TRANSLATIONS: {
       NEW_RESERVATION: 'Nouvelle Réservation',
       EDIT_RESERVATION: 'Modifier Réservation',
@@ -34,8 +25,8 @@ const CONFIG = {
         PHOTO_BOOTH: 'Borne Photo'
       },
       AVAILABILITY: {
-        AVAILABLE: '✅ Tireuses Disponibles',
-        RESERVED: '❌ Tireuses Réservées'
+        AVAILABLE: 'Tireuses Disponibles',
+        RESERVED: 'Tireuses Réservées'
       }
     },
     RESERVATION_STATUS: {
@@ -43,4 +34,4 @@ const CONFIG = {
       EXPIRED: 'reservation-expired',
       UPCOMING: ''
     }
-  };
+};
